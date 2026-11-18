@@ -67,12 +67,12 @@ export default function BookingDetail() {
       </Link>
 
       {isNew && booking.status === 'pending' && (
-        <div className="mt-5 flex items-center gap-5 rounded-[26px] border-[1.5px] border-ink bg-sun p-5 md:p-7" data-testid="booking-confirmed">
-          <span className="badge-flip grid size-16 flex-none place-items-center rounded-full border-[1.5px] border-ink bg-ink text-sun md:size-20">
+        <div className="mt-5 flex items-center gap-5 rounded-[26px] border border-line-2 bg-brand-soft p-5 md:p-7" data-testid="booking-confirmed">
+          <span className="badge-flip grid size-16 flex-none place-items-center rounded-full border border-line-2 bg-brand text-brand-light md:size-20">
             <Check className="size-8 md:size-10" strokeWidth={3} aria-hidden />
           </span>
           <div>
-            <h1 className="display text-3xl font-extrabold md:text-5xl">Booking confirmed!</h1>
+            <h1 className="text-[24px] font-semibold tracking-[-0.02em] md:text-[30px]">Booking confirmed!</h1>
             <p className="mt-1 text-[15px]">We’re assigning the best-rated pro near you. You’ll see them here.</p>
           </div>
         </div>
@@ -84,25 +84,25 @@ export default function BookingDetail() {
             {booking.code}
           </p>
           {!isNew || booking.status !== 'pending' ? (
-            <h1 className="display mt-1 text-[40px] font-extrabold md:text-[56px]">{STATUS_LABEL[booking.status]}</h1>
+            <h1 className="display mt-1 text-[26px] font-semibold md:text-[34px]">{STATUS_LABEL[booking.status]}</h1>
           ) : (
-            <h2 className="display mt-1 text-[32px] font-extrabold md:text-[44px]">{booking.categoryName}</h2>
+            <h2 className="display mt-1 text-[26px] font-semibold md:text-[32px]">{booking.categoryName}</h2>
           )}
         </div>
         <StatusChip status={booking.status} />
       </header>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_380px]">
-        <div className="space-y-5">
+        <div className="min-w-0 space-y-5">
           {booking.pin && (
-            <section className="flex flex-col gap-4 rounded-[22px] border-[1.5px] border-ink bg-ink p-5 text-white md:flex-row md:items-center md:justify-between md:p-7" aria-label="Service PIN">
+            <section className="flex flex-col gap-4 rounded-[22px] border border-line-2 bg-brand p-5 text-white md:flex-row md:items-center md:justify-between md:p-7" aria-label="Service PIN">
               <div>
-                <p className="text-[12px] font-bold uppercase tracking-wider text-sun">Your service PIN</p>
+                <p className="text-[12px] font-bold uppercase tracking-wider text-brand-light">Your service PIN</p>
                 <p className="mt-1 max-w-xs text-[14px] text-mute-2">Share it only when your pro arrives. Work starts after they enter it.</p>
               </div>
               <p className="flex gap-2" data-testid="service-pin" data-pin={booking.pin}>
                 {booking.pin.split('').map((d, i) => (
-                  <span key={i} className="display grid size-14 place-items-center rounded-2xl bg-sun text-3xl font-extrabold text-ink md:size-16">
+                  <span key={i} className="display grid size-14 place-items-center rounded-2xl bg-brand-soft text-3xl font-semibold text-ink md:size-16">
                     {d}
                   </span>
                 ))}
@@ -112,7 +112,7 @@ export default function BookingDetail() {
 
           {booking.professional && (
             <section className="card-soft flex items-center gap-4 p-5" aria-label="Your professional" data-testid="pro-card">
-              <span className="display grid size-14 flex-none place-items-center rounded-2xl border-[1.5px] border-ink bg-sun text-xl font-bold">{initials(booking.professional.name)}</span>
+              <span className="display grid size-14 flex-none place-items-center rounded-2xl border border-line-2 bg-brand-soft text-xl font-bold">{initials(booking.professional.name)}</span>
               <div className="min-w-0 flex-1">
                 <p className="text-[12px] font-bold uppercase tracking-wider text-mute">Your professional</p>
                 <p className="truncate text-[18px] font-semibold">{booking.professional.name}</p>
@@ -125,7 +125,7 @@ export default function BookingDetail() {
                 </p>
               </div>
               {['assigned', 'on_the_way', 'in_progress'].includes(booking.status) && (
-                <a href={`tel:+91${booking.professional.phone}`} aria-label={`Call ${booking.professional.name}`} className="grid size-12 flex-none place-items-center rounded-full bg-ink text-white">
+                <a href={`tel:+91${booking.professional.phone}`} aria-label={`Call ${booking.professional.name}`} className="grid size-12 flex-none place-items-center rounded-xl bg-brand text-white">
                   <Phone className="size-5" aria-hidden />
                 </a>
               )}
@@ -133,7 +133,7 @@ export default function BookingDetail() {
           )}
 
           <section className="card-soft p-5 md:p-7" aria-labelledby="track-title">
-            <h2 id="track-title" className="display mb-5 text-2xl font-bold">
+            <h2 id="track-title" className="mb-5 text-[20px] font-semibold tracking-[-0.02em]">
               Live status
             </h2>
             <StatusTrack booking={booking} />
@@ -244,7 +244,7 @@ function CancelDialog({ open, booking, onClose, onDone }: { open: boolean; booki
       <fieldset className="space-y-2">
         <legend className="mb-3 text-[14px] text-mute">Tell us why, so we can do better.</legend>
         {REASONS.map((r) => (
-          <label key={r} className={clsx('flex cursor-pointer items-center gap-3 rounded-2xl border-[1.5px] px-4 py-3 text-[14px] font-medium', reason === r ? 'border-ink bg-sun-soft' : 'border-line-2')}>
+          <label key={r} className={clsx('flex cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3 text-[14px] font-medium', reason === r ? 'border-line-2 bg-brand-soft' : 'border-line-2')}>
             <input type="radio" name="reason" value={r} checked={reason === r} onChange={() => setReason(r)} className="accent-ink" />
             {r}
           </label>
@@ -301,8 +301,8 @@ function ReviewCard({ booking, onDone }: { booking: Booking; onDone: (b: Booking
   const [comment, setComment] = useState('');
   const m = useMutation({ mutationFn: () => api.reviewBooking(booking.id, rating, comment), onSuccess: (r) => onDone(r.booking) });
   return (
-    <section className="rounded-[22px] border-[1.5px] border-ink bg-sun p-5 md:p-7" aria-labelledby="rate-title">
-      <h2 id="rate-title" className="display text-2xl font-bold">
+    <section className="rounded-[22px] border border-line-2 bg-brand-soft p-5 md:p-7" aria-labelledby="rate-title">
+      <h2 id="rate-title" className="text-[20px] font-semibold tracking-[-0.02em]">
         How did {booking.professional?.name.split(' ')[0] ?? 'it'} do?
       </h2>
       <p className="mt-1 text-[14px]">Your rating helps other customers and rewards great pros.</p>

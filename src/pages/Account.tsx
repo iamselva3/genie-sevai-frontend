@@ -87,16 +87,16 @@ export default function Account() {
   return (
     <div className="mx-auto max-w-[1240px] px-4 pt-6 md:px-8 md:pt-10">
       <div className="flex items-center gap-5">
-        <span className="display grid size-20 place-items-center rounded-[22px] border-[1.5px] border-ink bg-sun text-3xl font-extrabold shadow-block-md">{initials(customer.name || 'You')}</span>
+        <span className="display grid size-20 place-items-center rounded-[22px] border border-line-2 bg-brand-soft text-3xl font-semibold shadow-block-md">{initials(customer.name || 'You')}</span>
         <div>
-          <h1 className="display text-[36px] font-extrabold md:text-[52px]">{customer.name || 'Your account'}</h1>
+          <h1 className="display text-[24px] font-semibold md:text-[32px]">{customer.name || 'Your account'}</h1>
           <p className="text-[15px] text-mute">+91 {customer.phone}</p>
         </div>
       </div>
 
       <div className="mt-10 grid gap-6 lg:grid-cols-2">
         <section className="card-soft p-5 md:p-7" aria-labelledby="profile-title">
-          <h2 id="profile-title" className="display text-2xl font-bold">
+          <h2 id="profile-title" className="text-[20px] font-semibold tracking-[-0.02em]">
             Profile
           </h2>
           <form onSubmit={save} className="mt-5 space-y-4" noValidate>
@@ -111,7 +111,7 @@ export default function Account() {
 
         <section className="card-soft p-5 md:p-7" aria-labelledby="addr-title">
           <div className="flex items-center justify-between">
-            <h2 id="addr-title" className="display text-2xl font-bold">
+            <h2 id="addr-title" className="text-[20px] font-semibold tracking-[-0.02em]">
               Saved addresses
             </h2>
             {!adding && (
@@ -153,7 +153,7 @@ export default function Account() {
           { to: '/help', label: 'Help & support', text: 'FAQs and contact' },
           { to: '/terms', label: 'Terms & privacy', text: 'How we work' },
         ].map((l) => (
-          <Link key={l.to} to={l.to} className="card-soft group flex items-center justify-between p-5 hover:border-ink">
+          <Link key={l.to} to={l.to} className="card-soft group flex items-center justify-between p-5 hover:border-line-2">
             <span>
               <span className="block font-semibold">{l.label}</span>
               <span className="text-[13px] text-mute">{l.text}</span>

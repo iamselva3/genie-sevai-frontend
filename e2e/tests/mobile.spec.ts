@@ -24,6 +24,19 @@ test.describe('phone layout', () => {
     }
   });
 
+  test('checkout fits the screen (date chips scroll inside their card)', async ({ page, request }) => {
+    const customer = await createCustomer(request, 'Checkout Width');
+    await useCustomerSession(page, customer.token);
+    await page.goto('/c/cleaning');
+    await page.getByRole('button', { name: 'Add Bathroom deep cleaning' }).click();
+    await page.goto('/checkout');
+    await expect(page.getByTestId('slot-picker')).toBeVisible();
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    expect(overflow).toBeLessThanOrEqual(0);
+    const card = await page.getByTestId('slot-picker').boundingBox();
+    expect(card!.x + card!.width).toBeLessThanOrEqual(page.viewportSize()!.width);
+  });
+
   test('cart pill and sticky checkout bar', async ({ page }) => {
     await page.goto('/c/salon-women');
     await expect(page.getByRole('navigation', { name: 'Service groups' }).first()).toBeVisible();

@@ -56,7 +56,7 @@ export default function BecomePro() {
       <div className="grid gap-10 lg:grid-cols-[1fr_480px]">
         <div>
           <p className="font-mono text-[12px] font-semibold uppercase tracking-[0.2em] text-mute">Genie Sevai for professionals</p>
-          <h1 className="display mt-3 text-[52px] font-extrabold md:text-[88px]">
+          <h1 className="display mt-3 text-[34px] font-semibold md:text-[48px]">
             Your skill. <br />
             <span className="mark">Your hours.</span>
           </h1>
@@ -84,12 +84,12 @@ export default function BecomePro() {
               <span className="block-icon mx-auto size-16">
                 <PartyPopper className="size-7" aria-hidden />
               </span>
-              <h2 className="display mt-6 text-3xl font-bold">{done.duplicate ? 'We already have your details' : 'Application received'}</h2>
+              <h2 className="mt-6 text-[22px] font-semibold tracking-[-0.02em]">{done.duplicate ? 'We already have your details' : 'Application received'}</h2>
               <p className="mt-2 text-mute">Our partner team will call you within 2 working days.</p>
             </div>
           ) : (
             <form onSubmit={submit} className="space-y-4" noValidate>
-              <h2 id="apply-title" className="display text-3xl font-bold">
+              <h2 id="apply-title" className="text-[22px] font-semibold tracking-[-0.02em]">
                 Apply in 2 minutes
               </h2>
               <Field label="Full name" value={name} onChange={(e) => setName(e.target.value)} error={errors.name} autoComplete="name" />
@@ -133,7 +133,7 @@ export default function BecomePro() {
               </fieldset>
               <TextArea label="Anything else? (optional)" value={message} onChange={(e) => setMessage(e.target.value)} maxLength={1000} />
               <FormError>{formError}</FormError>
-              <Button type="submit" block size="lg" variant="sun" busy={busy}>
+              <Button type="submit" block size="lg" busy={busy}>
                 Send application
               </Button>
             </form>

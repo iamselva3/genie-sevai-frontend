@@ -15,20 +15,21 @@ import { useScrollLock } from '../lib/hooks';
 
 /* ---------------- Button ---------------- */
 
+/** ink = primary (blue), sun = outlined accent (e.g. "Add"), outline = neutral, ghost, danger. */
 type Variant = 'ink' | 'sun' | 'outline' | 'ghost' | 'danger';
 type Size = 'sm' | 'md' | 'lg';
 
 const VARIANTS: Record<Variant, string> = {
-  ink: 'bg-ink text-white hover:-translate-x-px hover:-translate-y-px hover:shadow-[4px_4px_0_0_var(--color-sun)] active:translate-x-0 active:translate-y-0 active:shadow-none',
-  sun: 'bg-sun text-ink border-[1.5px] border-ink shadow-block hover:-translate-x-px hover:-translate-y-px hover:shadow-block-md active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
-  outline: 'bg-white text-ink border-[1.5px] border-ink hover:bg-paper',
-  ghost: 'bg-transparent text-ink hover:bg-line/70',
+  ink: 'bg-brand text-white shadow-[0_1px_2px_rgb(15_23_42/0.1)] hover:bg-brand-dark',
+  sun: 'bg-white text-brand border border-brand/45 hover:bg-brand-soft hover:border-brand',
+  outline: 'bg-white text-ink border border-line-2 hover:border-ink-3',
+  ghost: 'bg-transparent text-ink hover:bg-tile',
   danger: 'bg-bad text-white hover:opacity-90',
 };
 const SIZES: Record<Size, string> = {
-  sm: 'h-9 px-4 text-[13px] gap-1.5',
-  md: 'h-12 px-5 text-[15px] gap-2',
-  lg: 'h-14 px-7 text-base gap-2.5',
+  sm: 'h-9 px-3.5 text-[13px] gap-1.5 rounded-lg',
+  md: 'h-11 px-5 text-[15px] gap-2 rounded-xl',
+  lg: 'h-[52px] px-6 text-[15.5px] gap-2.5 rounded-xl',
 };
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -49,7 +50,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       disabled={disabled || busy}
       aria-busy={busy || undefined}
       className={clsx(
-        'inline-flex select-none items-center justify-center rounded-full font-semibold transition-all duration-200 disabled:opacity-45 disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0',
+        'inline-flex select-none items-center justify-center font-semibold transition-all duration-200 active:scale-[0.98] disabled:opacity-45 disabled:active:scale-100',
         VARIANTS[variant],
         SIZES[size],
         block && 'w-full',
@@ -69,7 +70,7 @@ export function IconButton({ label, className, children, ...rest }: ButtonHTMLAt
       type="button"
       aria-label={label}
       title={label}
-      className={clsx('grid size-11 place-items-center rounded-full transition-colors hover:bg-line/70', className)}
+      className={clsx('grid size-10 place-items-center rounded-full transition-colors hover:bg-tile', className)}
       {...rest}
     >
       {children}
@@ -88,7 +89,6 @@ interface ModalProps {
   /** sheet: bottom sheet everywhere; side: bottom sheet on phones, right panel on desktop; center: dialog */
   variant?: 'sheet' | 'side' | 'center';
   size?: 'sm' | 'md' | 'lg';
-  labelledBy?: string;
 }
 
 export function Modal({ open, onClose, title, children, footer, variant = 'side', size = 'md' }: ModalProps) {
@@ -127,22 +127,22 @@ export function Modal({ open, onClose, title, children, footer, variant = 'side'
         aria-labelledby={titleId}
         tabIndex={-1}
         className={clsx(
-          'absolute flex max-h-[92dvh] flex-col bg-white outline-none',
+          'absolute flex max-h-[92dvh] flex-col bg-white shadow-block-lg outline-none',
           variant === 'center'
-            ? 'left-1/2 top-1/2 w-[calc(100%-32px)] -translate-x-1/2 -translate-y-1/2 animate-pop rounded-[26px] border-[1.5px] border-ink shadow-block-lg md:max-w-md'
-            : 'sheet inset-x-0 bottom-0 rounded-t-[28px] border-t-[1.5px] border-ink',
-          variant === 'side' && 'sheet-side md:inset-y-0 md:left-auto md:right-0 md:h-full md:max-h-none md:w-full md:rounded-none md:rounded-l-[28px] md:border-l-[1.5px] md:border-t-0',
+            ? 'left-1/2 top-1/2 w-[calc(100%-32px)] -translate-x-1/2 -translate-y-1/2 animate-pop rounded-3xl md:max-w-md'
+            : 'sheet inset-x-0 bottom-0 rounded-t-3xl',
+          variant === 'side' && 'sheet-side md:inset-y-0 md:left-auto md:right-0 md:h-full md:max-h-none md:w-full md:rounded-none md:rounded-l-3xl',
           variant === 'side' && widths[size],
           variant === 'sheet' && 'md:left-1/2 md:max-w-xl md:-translate-x-1/2',
         )}
       >
-        {variant !== 'center' && <div className="mx-auto mt-2.5 h-1.5 w-12 flex-none rounded-full bg-line md:hidden" aria-hidden />}
+        {variant !== 'center' && <div className="mx-auto mt-2.5 h-1.5 w-11 flex-none rounded-full bg-line-2 md:hidden" aria-hidden />}
         <div className="flex flex-none items-start justify-between gap-4 px-5 pb-3 pt-4 md:px-7 md:pt-6">
-          <h2 id={titleId} className="display text-[26px] font-bold leading-tight">
+          <h2 id={titleId} className="text-[21px] font-semibold leading-tight tracking-[-0.02em]">
             {title}
           </h2>
-          <IconButton label="Close" onClick={onClose} className="-mr-2 -mt-1 border-[1.5px] border-line">
-            <X className="size-5" />
+          <IconButton label="Close" onClick={onClose} className="-mr-1.5 -mt-1 bg-tile hover:bg-line">
+            <X className="size-[18px]" />
           </IconButton>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-5 md:px-7">{children}</div>
@@ -171,11 +171,11 @@ export const Field = forwardRef<HTMLInputElement, FieldProps>(function Field({ l
         {label}
       </label>
       <div className="relative">
-        {lead && <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[15px] font-semibold text-mute">{lead}</span>}
+        {lead && <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[15px] font-medium text-mute">{lead}</span>}
         <input
           ref={ref}
           id={fid}
-          className={clsx('field', !!lead && 'pl-14')}
+          className={clsx('field', !!lead && 'pl-12')}
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? `${fid}-err` : undefined}
           {...rest}
@@ -213,7 +213,7 @@ export function TextArea({ label, error, id, className, ...rest }: TextareaHTMLA
 export function FormError({ children }: { children?: ReactNode }) {
   if (!children) return null;
   return (
-    <p role="alert" className="rounded-2xl border-[1.5px] border-bad bg-white px-4 py-3 text-sm font-medium text-bad">
+    <p role="alert" className="rounded-xl border border-[#fecdca] bg-[#fef3f2] px-4 py-3 text-sm font-medium text-bad">
       {children}
     </p>
   );
@@ -222,13 +222,14 @@ export function FormError({ children }: { children?: ReactNode }) {
 /* ---------------- Stepper ---------------- */
 
 export function Stepper({ value, onChange, label, max = 10, size = 'md' }: { value: number; onChange: (n: number) => void; label: string; max?: number; size?: 'sm' | 'md' }) {
-  const h = size === 'sm' ? 'h-9' : 'h-11';
+  const h = size === 'sm' ? 'h-9' : 'h-10';
+  const btn = size === 'sm' ? 'w-8' : 'w-9';
   return (
-    <div className={clsx('inline-flex items-center rounded-full border-[1.5px] border-ink bg-sun shadow-block', h)}>
-      <button type="button" aria-label={`Remove one ${label}`} onClick={() => onChange(value - 1)} className={clsx('grid place-items-center rounded-full', size === 'sm' ? 'size-9' : 'size-11')}>
+    <div className={clsx('inline-flex items-center rounded-lg border border-brand/45 bg-brand-soft text-brand-dark', h)}>
+      <button type="button" aria-label={`Remove one ${label}`} onClick={() => onChange(value - 1)} className={clsx('grid h-full place-items-center rounded-l-lg hover:bg-[#dce8ff]', btn)}>
         <Minus className="size-4" strokeWidth={2.5} />
       </button>
-      <span className="min-w-6 text-center text-[15px] font-bold tabular-nums" aria-live="polite" aria-label={`${value} in cart`}>
+      <span className="min-w-6 text-center text-[15px] font-semibold tabular-nums" aria-live="polite" aria-label={`${value} in cart`}>
         {value}
       </span>
       <button
@@ -236,7 +237,7 @@ export function Stepper({ value, onChange, label, max = 10, size = 'md' }: { val
         aria-label={`Add one more ${label}`}
         disabled={value >= max}
         onClick={() => onChange(value + 1)}
-        className={clsx('grid place-items-center rounded-full disabled:opacity-40', size === 'sm' ? 'size-9' : 'size-11')}
+        className={clsx('grid h-full place-items-center rounded-r-lg hover:bg-[#dce8ff] disabled:opacity-40', btn)}
       >
         <Plus className="size-4" strokeWidth={2.5} />
       </button>
@@ -248,10 +249,10 @@ export function Stepper({ value, onChange, label, max = 10, size = 'md' }: { val
 
 export function Rating({ value, count, className }: { value: number; count?: string; className?: string }) {
   return (
-    <span className={clsx('inline-flex items-center gap-1 text-[13px] font-semibold', className)}>
-      <Star className="size-3.5 fill-ink" aria-hidden />
-      <span>{value.toFixed(1)}</span>
-      {count && <span className="font-medium text-mute">({count})</span>}
+    <span className={clsx('inline-flex items-center gap-1 text-[13px] font-medium text-ink-3', className)}>
+      <Star className="size-3.5 fill-ink text-ink" aria-hidden />
+      <span className="text-ink">{value.toFixed(2).replace(/0$/, '')}</span>
+      {count && <span className="text-mute">({count})</span>}
     </span>
   );
 }
@@ -267,11 +268,11 @@ export function StarInput({ value, onChange }: { value: number; onChange: (n: nu
           aria-pressed={value === n}
           onClick={() => onChange(n)}
           className={clsx(
-            'grid size-12 place-items-center rounded-2xl border-[1.5px] border-ink transition-all duration-200',
-            n <= value ? 'bg-sun shadow-block' : 'bg-white',
+            'grid size-12 place-items-center rounded-xl border transition-colors duration-200',
+            n <= value ? 'border-brand bg-brand text-white' : 'border-line-2 bg-white text-mute-2 hover:border-brand',
           )}
         >
-          <Star className={clsx('size-5', n <= value && 'fill-ink')} />
+          <Star className={clsx('size-5', n <= value && 'fill-white')} />
         </button>
       ))}
     </div>
@@ -287,8 +288,8 @@ export function Skeleton({ className }: { className?: string }) {
 export function Empty({ icon, title, children, action }: { icon?: ReactNode; title: string; children?: ReactNode; action?: ReactNode }) {
   return (
     <div className="card-soft flex flex-col items-center px-6 py-14 text-center">
-      {icon && <div className="block-icon mb-5 size-16 rotate-[-6deg]">{icon}</div>}
-      <h2 className="display text-3xl font-bold">{title}</h2>
+      {icon && <div className="mb-5 grid size-16 place-items-center rounded-full bg-brand-soft text-brand">{icon}</div>}
+      <h2 className="text-[24px] font-semibold tracking-[-0.02em]">{title}</h2>
       {children && <p className="mt-2 max-w-sm text-[15px] text-mute">{children}</p>}
       {action && <div className="mt-6">{action}</div>}
     </div>
@@ -297,11 +298,11 @@ export function Empty({ icon, title, children, action }: { icon?: ReactNode; tit
 
 export function Pill({ children, tone = 'line', className }: { children: ReactNode; tone?: 'line' | 'sun' | 'ink' | 'bad' | 'ok'; className?: string }) {
   const tones = {
-    line: 'bg-paper text-ink border-line-2',
-    sun: 'bg-sun text-ink border-ink',
+    line: 'bg-tile text-ink-3 border-line',
+    sun: 'bg-brand-soft text-brand-dark border-transparent',
     ink: 'bg-ink text-white border-ink',
-    bad: 'bg-white text-bad border-bad',
-    ok: 'bg-white text-ok border-ok',
+    bad: 'bg-[#fef3f2] text-bad border-[#fecdca]',
+    ok: 'bg-ok-soft text-ok border-transparent',
   };
-  return <span className={clsx('inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[12px] font-semibold', tones[tone], className)}>{children}</span>;
+  return <span className={clsx('inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[12px] font-medium', tones[tone], className)}>{children}</span>;
 }

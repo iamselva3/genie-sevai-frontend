@@ -86,12 +86,12 @@ export function SlotPicker({
                 if (value?.date !== d.date) onChange(null);
               }}
               className={clsx(
-                'flex w-[68px] flex-none flex-col items-center rounded-2xl border-[1.5px] py-2.5 transition-all disabled:opacity-35',
-                active ? 'border-ink bg-ink text-white' : 'border-line-2 bg-white hover:border-ink',
+                'flex w-[68px] flex-none flex-col items-center rounded-2xl border py-2.5 transition-all disabled:opacity-35',
+                active ? 'border-line-2 bg-brand text-white' : 'border-line-2 bg-white hover:border-line-2',
               )}
             >
               <span className="text-[11px] font-semibold uppercase">{i === 0 ? 'Today' : i === 1 ? 'Tmrw' : d.weekday}</span>
-              <span className="display text-2xl font-bold">{d.day}</span>
+              <span className="text-[20px] font-semibold tracking-[-0.02em]">{d.day}</span>
               <span className="text-[11px]">{d.month}</span>
             </button>
           );
@@ -119,8 +119,8 @@ export function SlotPicker({
                         data-time={s.time}
                         onClick={() => onChange({ date: day.date, time: s.time })}
                         className={clsx(
-                          'h-11 rounded-xl border-[1.5px] text-[14px] font-semibold transition-all disabled:border-line disabled:bg-paper disabled:text-mute-2 disabled:line-through',
-                          active ? 'border-ink bg-sun shadow-block' : 'border-line-2 bg-white hover:border-ink',
+                          'h-11 rounded-xl border text-[14px] font-semibold transition-all disabled:border-line disabled:bg-paper disabled:text-mute-2 disabled:line-through',
+                          active ? 'border-line-2 bg-brand-soft shadow-block' : 'border-line-2 bg-white hover:border-line-2',
                         )}
                       >
                         {time12(s.time)}
@@ -162,7 +162,7 @@ export function BillCard({
         <span data-testid="bill-total">{rupees(pricing.total)}</span>
       </div>
       {!!savings && savings > 0 && (
-        <p className="rounded-xl bg-sun-soft px-3 py-2 text-[13px] font-semibold">You save {rupees(savings)} on this booking</p>
+        <p className="rounded-xl bg-brand-soft px-3 py-2 text-[13px] font-semibold">You save {rupees(savings)} on this booking</p>
       )}
     </div>
   );
@@ -178,17 +178,17 @@ function Row({ label, value, strong }: { label: string; value: string; strong?: 
 }
 
 const CHIP: Record<BookingStatus, string> = {
-  pending: 'bg-white border-ink',
-  assigned: 'bg-sun border-ink',
-  on_the_way: 'bg-sun border-ink',
-  in_progress: 'bg-ink text-white border-ink',
+  pending: 'bg-white border-line-2',
+  assigned: 'bg-brand-soft border-line-2',
+  on_the_way: 'bg-brand-soft border-line-2',
+  in_progress: 'bg-brand text-white border-line-2',
   completed: 'bg-white text-ok border-ok',
   cancelled: 'bg-paper text-mute border-line-2',
 };
 
 export function StatusChip({ status }: { status: BookingStatus }) {
   return (
-    <span data-testid="status-chip" className={clsx('inline-flex items-center rounded-full border-[1.5px] px-3 py-1 text-[12px] font-bold', CHIP[status])}>
+    <span data-testid="status-chip" className={clsx('inline-flex items-center rounded-full border px-3 py-1 text-[12px] font-bold', CHIP[status])}>
       {STATUS_LABEL[status]}
     </span>
   );
@@ -210,7 +210,7 @@ export function StatusTrack({ booking }: { booking: Booking }) {
   if (booking.status === 'cancelled') {
     return (
       <div className="flex gap-4">
-        <span className="grid size-9 flex-none place-items-center rounded-full border-[1.5px] border-ink bg-paper">
+        <span className="grid size-9 flex-none place-items-center rounded-full border border-line-2 bg-paper">
           <X className="size-4" aria-hidden />
         </span>
         <div>
@@ -231,11 +231,11 @@ export function StatusTrack({ booking }: { booking: Booking }) {
         const now = i === current && booking.status !== 'completed';
         return (
           <li key={s.status} className="relative flex gap-4 pb-6 last:pb-0">
-            {i < STEPS.length - 1 && <span className={clsx('absolute left-[17px] top-9 h-[calc(100%-36px)] w-[2px]', done ? 'bg-ink' : 'bg-line')} aria-hidden />}
+            {i < STEPS.length - 1 && <span className={clsx('absolute left-[17px] top-9 h-[calc(100%-36px)] w-[2px]', done ? 'bg-brand' : 'bg-line')} aria-hidden />}
             <span
               className={clsx(
-                'track-dot grid size-9 flex-none place-items-center rounded-full border-[1.5px] text-[13px] font-bold',
-                done ? 'border-ink bg-ink text-white' : now ? 'is-now border-ink bg-sun' : 'border-line-2 bg-white text-mute',
+                'track-dot grid size-9 flex-none place-items-center rounded-full border text-[13px] font-bold',
+                done ? 'border-line-2 bg-brand text-white' : now ? 'is-now border-line-2 bg-brand-soft' : 'border-line-2 bg-white text-mute',
               )}
             >
               {done ? <Check className="size-4" strokeWidth={3} aria-hidden /> : i + 1}

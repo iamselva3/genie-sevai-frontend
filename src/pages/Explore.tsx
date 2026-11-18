@@ -18,7 +18,7 @@ export default function Explore() {
   return (
     <div className="mx-auto max-w-[1240px] px-4 pt-6 md:px-8 md:pt-10">
       <p className="font-mono text-[12px] font-semibold uppercase tracking-[0.2em] text-mute">Explore · {city?.name ?? '…'}</p>
-      <h1 className="display mt-3 text-[48px] font-extrabold md:text-[80px]">
+      <h1 className="display mt-3 text-[26px] font-semibold md:text-[34px]">
         Everything <span className="mark">we do.</span>
       </h1>
       <div className="relative mt-8 max-w-2xl">
@@ -31,13 +31,13 @@ export default function Explore() {
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="Search for a service"
-          className="h-14 w-full rounded-full border-[1.5px] border-ink bg-white pl-14 pr-5 text-[16px] font-medium shadow-block outline-none focus:shadow-block-md"
+          className="h-14 w-full rounded-full border border-line-2 bg-white pl-14 pr-5 text-[16px] font-medium shadow-block outline-none focus:shadow-block-md"
         />
       </div>
 
       {term.length >= 2 ? (
         <section className="mt-10" aria-live="polite">
-          <h2 className="display text-3xl font-bold">Results for “{term}”</h2>
+          <h2 className="text-[22px] font-semibold tracking-[-0.02em]">Results for “{term}”</h2>
           {results.isLoading ? (
             <div className="mt-5 flex gap-3">
               <Skeleton className="h-[214px] w-[260px]" />
@@ -56,7 +56,7 @@ export default function Explore() {
       ) : null}
 
       <section className="mt-12" aria-labelledby="all-cats">
-        <h2 id="all-cats" className="display text-3xl font-bold md:text-4xl">
+        <h2 id="all-cats" className="text-[20px] font-semibold tracking-[-0.02em] md:text-[24px]">
           All categories
         </h2>
         <div className="mt-5 grid grid-cols-3 gap-x-3 gap-y-6 sm:grid-cols-4 lg:grid-cols-5 lg:gap-x-5">

@@ -61,10 +61,11 @@ test.describe('brand rules', () => {
     }
   });
 
-  test('home: category grid, 3D offer carousel and promises', async ({ page }) => {
+  test('home: category grid, offer banners and promises', async ({ page }) => {
     await page.goto('/');
-    // Header: where we serve + search
-    await expect(page.getByTestId('city-pill')).toContainText('In Chennai');
+    // Header: next free slot (live from the API) + where we serve + search
+    await expect(page.getByTestId('city-pill')).toContainText('Chennai');
+    await expect(page.getByTestId('city-pill')).toContainText(/Next slot \d{1,2}(:\d{2})? (AM|PM)/);
     await expect(page.getByRole('button', { name: 'Search services' })).toBeVisible();
 
     // "What do you need help with?" grid
@@ -73,10 +74,11 @@ test.describe('brand rules', () => {
     await expect(grid.getByTestId('category-tile')).toHaveCount(10);
     await expect(grid.locator('[data-slug=cleaning]')).toContainText('from ₹499');
 
-    // Offer carousel: one slide per public coupon plus two brand slides, rotating in 3D
+    // Offer banners: two service banners (with live prices) and the two public coupons
     const slides = page.getByTestId('promo-slide');
     await expect(slides).toHaveCount(4);
     await expect(slides.nth(0)).toHaveClass(/is-active/);
+    await expect(slides.nth(0)).toContainText('₹499');
     await page.getByRole('button', { name: 'Show offer 2' }).click();
     await expect(slides.nth(1)).toHaveClass(/is-active/);
     await expect(slides.nth(1)).toContainText('Flat ₹100 off');
@@ -86,13 +88,12 @@ test.describe('brand rules', () => {
     await expect(page.getByRole('heading', { name: 'Our promises' })).toBeVisible();
     await expect(page.locator('section[aria-labelledby=promise-title] li')).toHaveCount(4);
 
-    // 3D cube in the first banner: six category faces, clicking one opens it
+    // Category tiles carry illustrations; the first banner books its service
+    await expect(grid.locator('[data-slug=cleaning] svg')).toHaveCount(1);
     await page.getByRole('button', { name: 'Show offer 1' }).click();
-    await expect(page.locator('.cube .cube-face')).toHaveCount(6);
-    const transform = await page.locator('.cube').evaluate((el) => getComputedStyle(el).transform);
-    expect(transform).toContain('matrix3d');
-    await page.locator('.cube-face[data-face="0"]').click({ force: true });
-    await expect(page).toHaveURL(/\/c\/[a-z-]+/);
+    await slides.nth(0).getByRole('link', { name: 'Book now' }).click();
+    await expect(page).toHaveURL(/\/c\/cleaning\?s=bathroom-deep-cleaning/);
+    await expect(page.getByRole('dialog', { name: 'Bathroom deep cleaning' })).toBeVisible();
   });
 
   test('home shelves: spotlight, most booked and category rows', async ({ page }) => {

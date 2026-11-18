@@ -22,7 +22,7 @@ function LegalPage({ title, updated, sections }: { title: string; updated: strin
   return (
     <div className="mx-auto max-w-3xl px-4 pt-6 md:px-8 md:pt-10">
       <p className="font-mono text-[12px] font-semibold uppercase tracking-[0.2em] text-mute">Updated {updated}</p>
-      <h1 className="display mt-3 text-[44px] font-extrabold md:text-[64px]">{title}</h1>
+      <h1 className="display mt-3 text-[26px] font-semibold md:text-[34px]">{title}</h1>
       <div className="mt-10 space-y-8">
         {sections.map(([h, p], i) => (
           <section key={h} className="grid gap-2 md:grid-cols-[48px_1fr]">

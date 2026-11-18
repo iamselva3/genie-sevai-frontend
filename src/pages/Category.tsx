@@ -10,7 +10,7 @@ import { useCity } from '../context/city';
 import { api, ApiError } from '../lib/api';
 import { duration, rupees } from '../lib/format';
 import { useDocumentTitle } from '../lib/hooks';
-import { categoryIcon } from '../lib/icons';
+import { CategoryArt } from '../components/art';
 
 const groupId = (g: string) => `group-${g.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 
@@ -75,7 +75,6 @@ export default function CategoryPage() {
     );
   }
 
-  const Icon = categoryIcon(data.category.icon);
   const inThisCategory = cart.category?.slug === slug;
   const avgRating = data?.services.length ? data.services.reduce((n, s) => n + s.rating, 0) / data.services.length : null;
 
@@ -88,12 +87,12 @@ export default function CategoryPage() {
         </Link>
         <div className="mt-5 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div className="flex items-start gap-5">
-            <span className="block-icon size-16 rotate-[-6deg] md:size-20">
-              <Icon className="size-8 md:size-10" strokeWidth={1.6} aria-hidden />
+            <span className="grid size-[72px] flex-none place-items-center rounded-2xl bg-tile md:size-24">
+              <CategoryArt icon={data.category.icon} className="w-[84%]" />
             </span>
             <div>
               {data ? (
-                <h1 className="display text-[40px] font-extrabold md:text-[64px]">{data.category.name}</h1>
+                <h1 className="display text-[26px] font-semibold md:text-[34px]">{data.category.name}</h1>
               ) : (
                 <Skeleton className="h-12 w-64" />
               )}
@@ -138,9 +137,9 @@ export default function CategoryPage() {
               <a
                 key={g}
                 href={`#${groupId(g)}`}
-                className={clsx('flex items-center gap-3 rounded-xl px-3 py-2 text-[14px] font-semibold transition-colors', activeGroup === g ? 'bg-ink text-white' : 'hover:bg-white')}
+                className={clsx('flex items-center gap-3 rounded-xl px-3 py-2 text-[14px] font-semibold transition-colors', activeGroup === g ? 'bg-brand text-white' : 'hover:bg-white')}
               >
-                <span className="font-mono text-[11px] opacity-60">{String(i + 1).padStart(2, '0')}</span>
+                <span className={clsx('font-mono text-[11px]', activeGroup !== g && 'opacity-60')}>{String(i + 1).padStart(2, '0')}</span>
                 {g}
               </a>
             ))}
@@ -160,7 +159,7 @@ export default function CategoryPage() {
           ) : (
             data.groups.map((g) => (
               <section key={g} id={groupId(g)} data-group={g} className="card-soft mb-5 px-5 py-2 md:px-7">
-                <h2 className="display pb-1 pt-5 text-[26px] font-bold">{g}</h2>
+                <h2 className="pb-1 pt-5 text-[19px] font-semibold tracking-[-0.01em]">{g}</h2>
                 {data.services
                   .filter((s) => s.group === g)
                   .map((s) => (
@@ -176,14 +175,14 @@ export default function CategoryPage() {
           <div className="card sticky top-[calc(var(--header-h)+16px)] p-5">
             <div className="flex items-center gap-2">
               <ShoppingBag className="size-5" aria-hidden />
-              <h2 className="display text-2xl font-bold">Your cart</h2>
+              <h2 className="text-[20px] font-semibold tracking-[-0.02em]">Your cart</h2>
             </div>
             {count === 0 ? (
               <p className="mt-4 text-[14px] text-mute">Add services to see your total here.</p>
             ) : !inThisCategory ? (
               <div className="mt-4 text-[14px] text-mute">
                 You have {count} item{count > 1 ? 's' : ''} from <strong className="text-ink">{cart.category?.name}</strong>.
-                <Link to="/cart" className="mt-4 flex h-11 items-center justify-center rounded-full bg-ink font-semibold text-white">
+                <Link to="/cart" className="mt-4 flex h-11 items-center justify-center rounded-xl bg-brand font-semibold text-white">
                   Go to cart
                 </Link>
               </div>
@@ -202,9 +201,9 @@ export default function CategoryPage() {
                     </li>
                   ))}
                 </ul>
-                <Link to="/cart" className="mt-5 flex h-12 items-center justify-between rounded-full bg-ink pl-5 pr-2 font-semibold text-white">
+                <Link to="/cart" className="mt-5 flex h-12 items-center justify-between rounded-xl bg-brand pl-5 pr-2 font-semibold text-white">
                   <span>{rupees(subtotal)}</span>
-                  <span className="inline-flex h-9 items-center gap-1 rounded-full bg-sun px-4 text-[14px] text-ink">
+                  <span className="inline-flex h-9 items-center gap-1 rounded-full bg-brand-soft px-4 text-[14px] text-ink">
                     Continue <ArrowRight className="size-4" aria-hidden />
                   </span>
                 </Link>

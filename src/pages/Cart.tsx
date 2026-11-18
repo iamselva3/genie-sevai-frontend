@@ -57,10 +57,10 @@ export default function CartPage() {
       <Link to={`/c/${cart.category?.slug}`} className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-mute hover:text-ink">
         <ArrowLeft className="size-4" aria-hidden /> Add more from {cart.category?.name}
       </Link>
-      <h1 className="display mt-4 text-[44px] font-extrabold md:text-[64px]">Your cart</h1>
+      <h1 className="display mt-4 text-[26px] font-semibold md:text-[34px]">Your cart</h1>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_400px]">
-        <div className="space-y-6">
+        <div className="min-w-0 space-y-6">
           <section className="card-soft px-5 md:px-7" aria-label="Items">
             <ul>
               {cart.items.map((i) => (
@@ -133,7 +133,7 @@ export default function CartPage() {
                   key={c.code}
                   type="button"
                   onClick={() => apply(undefined, c.code)}
-                  className="rounded-2xl border-[1.5px] border-dashed border-line-2 p-3 text-left transition-colors hover:border-ink"
+                  className="rounded-2xl border border-dashed border-line-2 p-3 text-left transition-colors hover:border-line-2"
                 >
                   <span className="font-mono text-[13px] font-bold">{c.code}</span>
                   <span className="mt-1 block text-[12px] text-mute">{c.description}</span>
@@ -178,7 +178,7 @@ export function MobileBar({ total, children, top }: { total?: number; children: 
       <div className="h-24 lg:hidden" aria-hidden />
       <div className="fixed inset-x-3 bottom-[92px] z-30 lg:hidden" data-testid="mobile-bar">
         {top}
-        <div className="flex items-center gap-3 rounded-[22px] border-[1.5px] border-ink bg-white p-2.5 pl-4 shadow-block-md">
+        <div className="flex items-center gap-3 rounded-[22px] border border-line-2 bg-white p-2.5 pl-4 shadow-block-md">
           <div className="flex-none">
             <p className="text-[11px] font-semibold uppercase tracking-wider text-mute">Total</p>
             <p className="text-[18px] font-bold leading-tight">{total != null ? rupees(total) : '…'}</p>

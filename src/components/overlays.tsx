@@ -12,6 +12,7 @@ import { api, ApiError } from '../lib/api';
 import { isValidPhone, rupees } from '../lib/format';
 import { useDebounced, useScrollLock } from '../lib/hooks';
 import { categoryIcon } from '../lib/icons';
+import { CategoryArt } from './art';
 import { Button, Field, Modal } from './ui';
 
 export function Overlays() {
@@ -234,8 +235,8 @@ function CityPicker() {
                 toast(`Showing services in ${c.name}`);
               }}
               className={clsx(
-                'flex items-start justify-between rounded-2xl border-[1.5px] p-4 text-left transition-all',
-                active ? 'border-ink bg-sun shadow-block' : 'border-line-2 bg-white hover:border-ink',
+                'flex items-start justify-between rounded-2xl border p-4 text-left transition-all',
+                active ? 'border-line-2 bg-brand-soft shadow-block' : 'border-line-2 bg-white hover:border-line-2',
               )}
             >
               <span>
@@ -289,7 +290,7 @@ function SearchOverlay() {
   return createPortal(
     <div className="fixed inset-0 z-[75]">
       <div className="overlay" onClick={closeSearch} aria-hidden />
-      <div role="dialog" aria-modal="true" aria-label="Search services" className="absolute inset-0 flex animate-pop flex-col bg-paper md:inset-x-0 md:top-[8vh] md:mx-auto md:max-h-[78vh] md:max-w-2xl md:rounded-[28px] md:border-[1.5px] md:border-ink md:shadow-block-lg">
+      <div role="dialog" aria-modal="true" aria-label="Search services" className="absolute inset-0 flex animate-pop flex-col bg-paper md:inset-x-0 md:top-[8vh] md:mx-auto md:max-h-[78vh] md:max-w-2xl md:rounded-[28px] md:border md:border-line-2 md:shadow-block-lg">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -310,7 +311,7 @@ function SearchOverlay() {
             className="h-12 min-w-0 flex-1 bg-transparent text-lg font-medium outline-none placeholder:text-mute"
             autoComplete="off"
           />
-          <button type="button" onClick={closeSearch} aria-label="Close search" className="grid size-10 place-items-center rounded-full border-[1.5px] border-line">
+          <button type="button" onClick={closeSearch} aria-label="Close search" className="grid size-10 place-items-center rounded-full border border-line">
             <X className="size-5" aria-hidden />
           </button>
         </form>
@@ -344,7 +345,7 @@ function SearchOverlay() {
             <p className="text-mute">Searching…</p>
           ) : services.length === 0 && !results.data?.categories.length ? (
             <div className="py-10 text-center">
-              <p className="display text-2xl font-bold">Nothing for “{term}” yet</p>
+              <p className="text-[20px] font-semibold tracking-[-0.02em]">Nothing for “{term}” yet</p>
               <p className="mt-2 text-mute">Try a broader word like “cleaning” or “repair”.</p>
             </div>
           ) : (
@@ -352,7 +353,7 @@ function SearchOverlay() {
               {results.data?.categories.map((c) => (
                 <li key={c.slug}>
                   <button type="button" onClick={() => go(`/c/${c.slug}`)} className="flex w-full items-center gap-3 rounded-2xl p-3 text-left hover:bg-white">
-                    <span className="rounded-full bg-ink px-2.5 py-0.5 text-[11px] font-bold text-white">Category</span>
+                    <span className="rounded-xl bg-brand px-2.5 py-0.5 text-[11px] font-bold text-white">Category</span>
                     <span className="flex-1 font-semibold">{c.name}</span>
                     <ArrowRight className="size-4" aria-hidden />
                   </button>
@@ -361,6 +362,9 @@ function SearchOverlay() {
               {services.map((s, i) => (
                 <li key={s.id}>
                   <button type="button" onClick={() => go(`/c/${s.category?.slug}?s=${s.slug}`)} className="flex w-full items-center gap-3 rounded-2xl p-3 text-left hover:bg-white">
+                    <span className="grid size-12 flex-none place-items-center rounded-xl bg-tile">
+                      <CategoryArt icon={s.category?.icon} className="w-[86%]" />
+                    </span>
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-semibold">{s.name}</span>
                       <span className="text-[13px] text-mute">
@@ -394,7 +398,7 @@ function ReplaceCartDialog() {
         <Button variant="outline" onClick={cancelReplace}>
           Keep cart
         </Button>
-        <Button variant="sun" onClick={confirmReplace}>
+        <Button onClick={confirmReplace}>
           Replace
         </Button>
       </div>
@@ -414,8 +418,8 @@ function Toasts() {
           type="button"
           onClick={() => dismissToast(t.id)}
           className={clsx(
-            'pointer-events-auto animate-rise rounded-full border-[1.5px] px-5 py-2.5 text-[14px] font-semibold shadow-lift',
-            t.tone === 'bad' ? 'border-bad bg-white text-bad' : t.tone === 'ok' ? 'border-ink bg-sun text-ink' : 'border-ink bg-ink text-white',
+            'pointer-events-auto animate-rise rounded-full border px-5 py-2.5 text-[14px] font-semibold shadow-lift',
+            t.tone === 'bad' ? 'border-bad bg-white text-bad' : t.tone === 'ok' ? 'border-line-2 bg-brand-soft text-ink' : 'border-line-2 bg-brand text-white',
           )}
         >
           {t.message}

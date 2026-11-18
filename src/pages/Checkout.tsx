@@ -19,10 +19,10 @@ function Step({ n, title, done, children }: { n: number; title: string; done?: b
   return (
     <section className="card-soft p-5 md:p-7" aria-labelledby={`step-${n}`}>
       <div className="mb-5 flex items-center gap-3">
-        <span className={clsx('grid size-8 place-items-center rounded-full border-[1.5px] border-ink text-[13px] font-bold', done ? 'bg-ink text-white' : 'bg-sun')}>
+        <span className={clsx('grid size-8 place-items-center rounded-full border border-line-2 text-[13px] font-bold', done ? 'bg-brand text-white' : 'bg-brand-soft')}>
           {done ? <Check className="size-4" strokeWidth={3} aria-hidden /> : n}
         </span>
-        <h2 id={`step-${n}`} className="display text-2xl font-bold">
+        <h2 id={`step-${n}`} className="text-[20px] font-semibold tracking-[-0.02em]">
           {title}
         </h2>
       </div>
@@ -61,7 +61,7 @@ export default function Checkout() {
   if (ready && !token) {
     return (
       <div className="mx-auto max-w-xl px-4 pt-10 text-center">
-        <h1 className="display text-4xl font-extrabold">Sign in to continue</h1>
+        <h1 className="text-[26px] font-semibold tracking-[-0.02em]">Sign in to continue</h1>
         <p className="mt-3 text-mute">We’ll use your number to send booking updates.</p>
         <Button size="lg" className="mt-6" onClick={() => requireAuth()}>
           Sign in with OTP
@@ -110,7 +110,7 @@ export default function Checkout() {
       <Link to="/cart" className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-mute hover:text-ink">
         <ArrowLeft className="size-4" aria-hidden /> Back to cart
       </Link>
-      <h1 className="display mt-4 text-[44px] font-extrabold md:text-[64px]">Almost there</h1>
+      <h1 className="display mt-4 text-[26px] font-semibold md:text-[34px]">Almost there</h1>
       {customer && (
         <p className="mt-2 text-[15px] text-mute">
           Booking for <strong className="text-ink">{customer.name}</strong> · +91 {customer.phone}
@@ -118,7 +118,7 @@ export default function Checkout() {
       )}
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_400px]">
-        <div className="space-y-5">
+        <div className="min-w-0 space-y-5">
           <Step n={1} title={`Address in ${city?.name ?? 'your city'}`} done={!!addressId && !adding}>
             {!customer ? (
               <Skeleton className="h-24" />
@@ -134,8 +134,8 @@ export default function Checkout() {
                         aria-checked={addressId === a.id}
                         onClick={() => setAddressId(a.id)}
                         className={clsx(
-                          'flex items-start gap-3 rounded-2xl border-[1.5px] p-4 text-left transition-all',
-                          addressId === a.id ? 'border-ink bg-sun-soft shadow-block' : 'border-line-2 bg-white hover:border-ink',
+                          'flex items-start gap-3 rounded-2xl border p-4 text-left transition-all',
+                          addressId === a.id ? 'border-line-2 bg-brand-soft shadow-block' : 'border-line-2 bg-white hover:border-line-2',
                         )}
                       >
                         <MapPin className="mt-0.5 size-4 flex-none" aria-hidden />
@@ -145,7 +145,7 @@ export default function Checkout() {
                         </span>
                       </button>
                     ))}
-                    <button type="button" onClick={() => setAdding(true)} className="flex items-center gap-2 rounded-2xl border-[1.5px] border-dashed border-line-2 p-4 text-[14px] font-semibold hover:border-ink">
+                    <button type="button" onClick={() => setAdding(true)} className="flex items-center gap-2 rounded-2xl border border-dashed border-line-2 p-4 text-[14px] font-semibold hover:border-line-2">
                       <Plus className="size-4" aria-hidden /> Add a new address
                     </button>
                   </div>
@@ -172,7 +172,7 @@ export default function Checkout() {
 
           <Step n={3} title="Payment" done>
             <div role="radiogroup" aria-label="Payment method" className="grid gap-3">
-              <div role="radio" aria-checked="true" className="flex items-start gap-3 rounded-2xl border-[1.5px] border-ink bg-sun-soft p-4">
+              <div role="radio" aria-checked="true" className="flex items-start gap-3 rounded-2xl border border-line-2 bg-brand-soft p-4">
                 <Wallet className="mt-0.5 size-5 flex-none" aria-hidden />
                 <span>
                   <span className="block font-semibold">Pay after service</span>
@@ -205,7 +205,7 @@ export default function Checkout() {
             <div className="mt-4">{q ? <BillCard pricing={{ ...q, couponCode: q.coupon?.code }} savings={q.savings} /> : <Skeleton className="h-40" />}</div>
             {error && <div className="mt-4 hidden lg:block"><FormError>{error}</FormError></div>}
             <div className="mt-6 hidden lg:block">
-              <Button block size="lg" variant="sun" disabled={!canPlace} busy={busy} onClick={place}>
+              <Button block size="lg" disabled={!canPlace} busy={busy} onClick={place}>
                 {placeLabel}
               </Button>
             </div>
@@ -214,7 +214,7 @@ export default function Checkout() {
       </div>
 
       <MobileBar total={q?.total} top={error ? <div className="mb-2"><FormError>{error}</FormError></div> : null}>
-        <Button block size="lg" variant="sun" disabled={!canPlace} busy={busy} onClick={place}>
+        <Button block size="lg" disabled={!canPlace} busy={busy} onClick={place}>
           {placeLabel}
         </Button>
       </MobileBar>

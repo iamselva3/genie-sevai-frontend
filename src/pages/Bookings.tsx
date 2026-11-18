@@ -37,8 +37,8 @@ export default function Bookings() {
 
   return (
     <div className="mx-auto max-w-[1240px] px-4 pt-6 md:px-8 md:pt-10">
-      <h1 className="display text-[44px] font-extrabold md:text-[64px]">Bookings</h1>
-      <div className="mt-6 inline-flex rounded-full border-[1.5px] border-ink bg-white p-1" role="tablist" aria-label="Booking lists">
+      <h1 className="display text-[26px] font-semibold md:text-[34px]">Bookings</h1>
+      <div className="mt-6 inline-flex rounded-full border border-line-2 bg-white p-1" role="tablist" aria-label="Booking lists">
         {(['upcoming', 'past'] as const).map((t) => (
           <button
             key={t}
@@ -46,7 +46,7 @@ export default function Bookings() {
             role="tab"
             aria-selected={tab === t}
             onClick={() => setTab(t)}
-            className={clsx('h-10 rounded-full px-5 text-[14px] font-semibold transition-colors', tab === t ? 'bg-ink text-white' : 'text-ink')}
+            className={clsx('h-10 rounded-full px-5 text-[14px] font-semibold transition-colors', tab === t ? 'bg-brand text-white' : 'text-ink')}
           >
             {t === 'upcoming' ? 'Upcoming' : 'Past'}
             {t === 'upcoming' && upcoming.length > 0 && ` (${upcoming.length})`}
@@ -65,7 +65,7 @@ export default function Bookings() {
           </div>
         ) : (
           list.map((b) => (
-            <Link key={b.id} to={`/bookings/${b.id}`} data-testid="booking-card" data-code={b.code} className="card-soft group flex flex-col p-5 transition-all hover:border-ink hover:shadow-block">
+            <Link key={b.id} to={`/bookings/${b.id}`} data-testid="booking-card" data-code={b.code} className="card-soft group flex flex-col p-5 transition-all hover:border-line-2 hover:shadow-block">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="font-mono text-[12px] font-semibold text-mute">{b.code}</p>

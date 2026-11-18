@@ -55,7 +55,7 @@ export default function Help() {
 
   return (
     <div className="mx-auto max-w-[1240px] px-4 pt-6 md:px-8 md:pt-10">
-      <h1 className="display text-[48px] font-extrabold md:text-[80px]">
+      <h1 className="display text-[26px] font-semibold md:text-[34px]">
         How can we <span className="mark">help?</span>
       </h1>
       <div className="mt-10 grid gap-6 lg:grid-cols-[1fr_440px]">
@@ -82,12 +82,12 @@ export default function Help() {
               <span className="block-icon mx-auto size-16">
                 <MessageCircle className="size-7" aria-hidden />
               </span>
-              <h2 className="display mt-6 text-3xl font-bold">Message sent</h2>
+              <h2 className="mt-6 text-[22px] font-semibold tracking-[-0.02em]">Message sent</h2>
               <p className="mt-2 text-mute">Our support team will call you back within a few hours.</p>
             </div>
           ) : (
             <form onSubmit={submit} className="space-y-4" noValidate>
-              <h2 id="contact-title" className="display text-3xl font-bold">
+              <h2 id="contact-title" className="text-[22px] font-semibold tracking-[-0.02em]">
                 Talk to us
               </h2>
               <Field label="Your name" value={name} onChange={(e) => setName(e.target.value)} error={errors.name} />
