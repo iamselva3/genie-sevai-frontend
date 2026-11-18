@@ -28,10 +28,12 @@ npm run preview    # serve dist/ on :5273
 npm test           # unit tests (Vitest)
 ```
 
-The API address comes from `VITE_API_URL` (default `http://localhost:5100/api/v1`). For production, set it at build time:
+Settings (see `.env.example`; put local values in `.env.local`). Both are read at build time:
+- `VITE_API_URL`: the API address (default `http://localhost:5100/api/v1`).
+- `VITE_GOOGLE_CLIENT_ID`: the Google OAuth client ID for **Continue with Google** (the same ID as `GOOGLE_CLIENT_ID` on the backend). Each address the site runs on (for example `http://localhost:5273` and the live domain) must be listed under the client's **Authorized JavaScript origins** in Google Cloud Console.
 
 ```bash
-VITE_API_URL=https://api.example.com/api/v1 npm run build
+VITE_API_URL=https://api.example.com/api/v1 VITE_GOOGLE_CLIENT_ID=1234-abc.apps.googleusercontent.com npm run build
 ```
 
 Host `dist/` as a static site with an SPA fallback, so unknown paths serve `index.html`.
@@ -57,7 +59,7 @@ Host `dist/` as a static site with an SPA fallback, so unknown paths serve `inde
   - Soft-3D SVG illustrations, picked by each category's icon key (admins choose the key). Each has its own colour (rose salon, violet grooming, teal cleaning, sky AC and so on).
   - Banner scenes (bathroom, AC, gift) for banners without a photo.
   - Solid tones only, no gradients.
-- **Booking flow**: category → service sheet → cart (one category at a time, coupons, server-side prices) → OTP sign-in → address → live slots → pay after service → confirmation.
+- **Booking flow**: category → service sheet → cart (one category at a time, coupons, server-side prices) → Continue with Google (the mobile number is asked once, for the professional) → address → live slots → pay after service → confirmation.
 - **Bookings**: live status, a 4-digit service PIN, the assigned professional, reschedule, cancel and rating.
 - **Other pages**: account, help desk, become a professional, terms and privacy.
 - **Design rules**: a black and white interface with colourful content, and no gradients (a test enforces this). No browser `alert`/`confirm` pop-ups.
@@ -95,7 +97,7 @@ The tests cover:
 - banners: the team uploads a photo in the admin panel, customers see it, and switching it off hides it
 - browsing, search and city availability
 - the one-category cart and coupons
-- booking end to end with OTP, then reschedule and cancel
+- booking end to end with Google sign-in and the mobile-number step, then reschedule and cancel. Google's script is replaced with a stand-in in the browser, and the test API accepts signed test tokens.
 - account and forms
 - admin control of service and category visibility, as seen by customers
 - assigning a professional → on the way → start with the PIN → complete → rating

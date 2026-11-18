@@ -1,14 +1,32 @@
+import { createHmac } from 'node:crypto';
 import { test as base, expect, type APIRequestContext, type Page } from '@playwright/test';
 
-import { ADMIN_URL, API, WEB_URL } from '../ports';
+import { ADMIN_URL, API, GOOGLE_TEST_SECRET, WEB_URL } from '../ports';
 export { ADMIN_URL, API, WEB_URL };
 export const ADMIN = { email: 'admin@sevai.in', password: 'Admin@12345' };
 export const PRO_PASSWORD = 'Pro@12345';
+
+/**
+ * Stand-in for Google's sign-in script (accounts.google.com/gsi/client). "Continue with Google" gets the
+ * token a test put in window.__e2eGoogleToken, or behaves as if the customer closed the Google window.
+ */
+const FAKE_GOOGLE = `
+window.google = { accounts: { oauth2: { initTokenClient: function (cfg) {
+  return { requestAccessToken: function () {
+    setTimeout(function () {
+      var token = window.__e2eGoogleToken;
+      window.__e2eGoogleToken = undefined;
+      if (token) cfg.callback({ access_token: token, token_type: 'Bearer', expires_in: 3599, scope: cfg.scope });
+      else if (cfg.error_callback) cfg.error_callback({ type: 'popup_closed' });
+    }, 50);
+  } };
+} } } };`;
 
 /** Every test page skips the splash unless the test opts out with test.use({ skipSplash: false }). */
 export const test = base.extend<{ skipSplash: boolean }>({
   skipSplash: [true, { option: true }],
   page: async ({ page, skipSplash }, use) => {
+    await page.route('https://accounts.google.com/gsi/client*', (route) => route.fulfill({ contentType: 'text/javascript', body: FAKE_GOOGLE }));
     if (skipSplash) {
       await page.addInitScript(() => {
         try {
@@ -58,13 +76,21 @@ export async function setCategoryVisible(request: APIRequestContext, slug: strin
   await json(await request.patch(`${API}/admin/categories/${category.id}`, { headers: bearer(token), data: { isActive } }));
 }
 
-/** Creates a customer through the OTP API and returns their token. */
-export async function createCustomer(request: APIRequestContext, name = 'E2E Customer') {
-  const phone = uniquePhone();
-  const sent = await json<{ devCode: string }>(await request.post(`${API}/auth/otp/send`, { data: { phone } }));
-  const { token } = await json<{ token: string }>(await request.post(`${API}/auth/otp/verify`, { data: { phone, code: sent.devCode } }));
-  await json(await request.patch(`${API}/me`, { headers: bearer(token), data: { name } }));
-  return { token, phone, name };
+/** A Google sign-in token the test API accepts (signed with GOOGLE_TEST_SECRET). */
+export function googleToken(profile: { name?: string; email?: string } = {}) {
+  seq += 1;
+  const sub = `e2e-${Date.now()}-${seq}`;
+  const payload = Buffer.from(JSON.stringify({ sub, email: profile.email ?? `${sub}@example.com`, name: profile.name ?? '' })).toString('base64url');
+  return `test.${payload}.${createHmac('sha256', GOOGLE_TEST_SECRET).update(payload).digest('base64url')}`;
+}
+
+/** Creates a customer through the Google sign-in API (with a mobile number unless phone is null) and returns their token. */
+export async function createCustomer(request: APIRequestContext, name = 'E2E Customer', phone: string | null = uniquePhone()) {
+  const { token, customer } = await json<{ token: string; customer: { email: string } }>(
+    await request.post(`${API}/auth/google`, { data: { accessToken: googleToken({ name }) } }),
+  );
+  if (phone) await json(await request.patch(`${API}/me`, { headers: bearer(token), data: { phone } }));
+  return { token, phone, name, email: customer.email };
 }
 
 /** Books a service for a customer at the first free slot (through the API, for test setup). */
@@ -115,16 +141,13 @@ export async function useCustomerSession(page: Page, token: string) {
   }, token);
 }
 
-/** Completes the OTP sign-in sheet in the web app (reads the code shown in test mode). */
-export async function signInWithOtp(page: Page, phone: string, name: string) {
-  await page.getByLabel('Mobile number').fill(phone);
-  await page.getByRole('button', { name: 'Get OTP' }).click();
-  const code = await page.getByTestId('dev-code').locator('strong').innerText();
-  expect(code).toMatch(/^\d{6}$/);
-  await page.getByLabel('One-time code').fill(code);
-  await page.getByRole('button', { name: 'Verify & continue' }).click();
-  await page.getByLabel('Your name').fill(name);
-  await page.getByRole('button', { name: 'Continue', exact: true }).click();
+/** Clicks "Continue with Google" in the sign-in sheet as the given Google account (the Google window is faked). */
+export async function signInWithGoogle(page: Page, profile: { name?: string; email?: string } = {}) {
+  const token = googleToken(profile);
+  await page.evaluate((t) => {
+    (window as unknown as { __e2eGoogleToken?: string }).__e2eGoogleToken = t;
+  }, token);
+  await page.getByRole('button', { name: 'Continue with Google' }).click();
 }
 
 /** Clicks something in the admin and waits until the API has saved the change. */

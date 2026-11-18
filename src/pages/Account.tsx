@@ -7,7 +7,7 @@ import { useAuth } from '../context/auth';
 import { useCity } from '../context/city';
 import { useUi } from '../context/ui';
 import { api, ApiError } from '../lib/api';
-import { initials } from '../lib/format';
+import { initials, isValidPhone } from '../lib/format';
 import { useDocumentTitle } from '../lib/hooks';
 import type { Address } from '../lib/types';
 import { SignInPrompt } from './Bookings';
@@ -18,7 +18,7 @@ export default function Account() {
   const { cities } = useCity();
   const { toast } = useUi();
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
@@ -29,11 +29,11 @@ export default function Account() {
   useEffect(() => {
     if (customer) {
       setName(customer.name);
-      setEmail(customer.email);
+      setPhone(customer.phone);
     }
   }, [customer]);
 
-  if (ready && !token) return <SignInPrompt title="Your Genie Sevai account" text="Sign in with your mobile number to manage your profile and addresses." />;
+  if (ready && !token) return <SignInPrompt title="Your Genie Sevai account" text="Sign in with your Google account to manage your profile and addresses." />;
   if (!customer) {
     return (
       <div className="mx-auto max-w-[1240px] space-y-4 px-4 pt-8 md:px-8">
@@ -45,10 +45,14 @@ export default function Account() {
 
   const save = async (e: FormEvent) => {
     e.preventDefault();
+    if (!isValidPhone(phone)) {
+      setError('Enter a valid 10-digit mobile number');
+      return;
+    }
     setSaving(true);
     setError(null);
     try {
-      const res = await api.updateMe({ name: name.trim(), email: email.trim() });
+      const res = await api.updateMe({ name: name.trim(), phone });
       setCustomer(res.customer);
       toast('Profile saved', 'ok');
     } catch (err) {
@@ -87,10 +91,19 @@ export default function Account() {
   return (
     <div className="mx-auto max-w-[1240px] px-4 pt-6 md:px-8 md:pt-10">
       <div className="flex items-center gap-5">
-        <span className="display grid size-20 place-items-center rounded-[22px] border border-line-2 bg-brand-soft text-3xl font-semibold shadow-block-md">{initials(customer.name || 'You')}</span>
-        <div>
+        <span className="display grid size-20 flex-none place-items-center overflow-hidden rounded-[22px] border border-line-2 bg-brand-soft text-3xl font-semibold shadow-block-md">
+          {customer.avatarUrl ? (
+            <img src={customer.avatarUrl} alt="" referrerPolicy="no-referrer" className="size-full object-cover" width={80} height={80} />
+          ) : (
+            initials(customer.name || 'You')
+          )}
+        </span>
+        <div className="min-w-0">
           <h1 className="display text-[24px] font-semibold md:text-[32px]">{customer.name || 'Your account'}</h1>
-          <p className="text-[15px] text-mute">+91 {customer.phone}</p>
+          <p className="truncate text-[15px] text-mute">
+            {customer.email}
+            {customer.phone && ` · +91 ${customer.phone}`}
+          </p>
         </div>
       </div>
 
@@ -101,7 +114,18 @@ export default function Account() {
           </h2>
           <form onSubmit={save} className="mt-5 space-y-4" noValidate>
             <Field label="Full name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" />
-            <Field label="Email (for receipts)" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
+            <Field
+              label="Mobile number"
+              lead="+91"
+              type="tel"
+              inputMode="numeric"
+              autoComplete="tel-national"
+              maxLength={10}
+              value={phone}
+              onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+              hint="Your professional calls this number before the visit."
+            />
+            <Field label="Email" type="email" value={customer.email} readOnly disabled hint="From your Google account." />
             <FormError>{error}</FormError>
             <Button type="submit" busy={saving}>
               Save profile

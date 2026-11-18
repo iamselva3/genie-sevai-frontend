@@ -14,7 +14,7 @@ export function SignInPrompt({ title, text }: { title: string; text: string }) {
   const { requireAuth } = useAuth();
   return (
     <div className="mx-auto max-w-[1240px] px-4 pt-8 md:px-8">
-      <Empty icon={<CalendarDays className="size-7" />} title={title} action={<Button onClick={() => requireAuth()}>Sign in with OTP</Button>}>
+      <Empty icon={<CalendarDays className="size-7" />} title={title} action={<Button onClick={() => requireAuth()}>Sign in with Google</Button>}>
         {text}
       </Empty>
     </div>

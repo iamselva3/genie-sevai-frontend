@@ -50,7 +50,7 @@ test.describe('phone layout', () => {
     await expect(bar).toBeVisible();
     await expect(bar).toContainText('₹1,198');
     await bar.getByRole('button', { name: 'Choose slot' }).click();
-    await expect(page.getByLabel('Mobile number')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Continue with Google' })).toBeVisible();
   });
 
   test('search opens full screen', async ({ page }) => {
