@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
-import { ADMIN_PORT, ADMIN_URL, API, API_PORT, WEB_PORT, WEB_URL } from './ports';
+import { ADMIN_PORT, ADMIN_URL, API, API_PORT, GOOGLE_CLIENT_ID, GOOGLE_TEST_SECRET, WEB_PORT, WEB_URL } from './ports';
 
 /**
  * End-to-end suite for Genie Sevai. It starts all three apps itself:
@@ -61,7 +61,8 @@ export default defineConfig({
       command: 'npm run dev:memory',
       cwd: backendDir,
       url: `http://localhost:${API_PORT}/health`,
-      env: { PORT: String(API_PORT) },
+      // Pictures go to a local folder (never the real R2 bucket) and sign-in uses test Google tokens.
+      env: { PORT: String(API_PORT), STORAGE_DRIVER: 'local', GOOGLE_TEST_SECRET, GOOGLE_CLIENT_ID },
       reuseExistingServer: reuse,
       timeout: 180_000,
       stdout: 'ignore',
@@ -70,7 +71,7 @@ export default defineConfig({
       command: `npm run build && npx vite preview --port ${WEB_PORT} --strictPort`,
       cwd: webDir,
       url: WEB_URL,
-      env: { VITE_API_URL: API },
+      env: { VITE_API_URL: API, VITE_GOOGLE_CLIENT_ID: GOOGLE_CLIENT_ID },
       reuseExistingServer: reuse,
       timeout: 180_000,
     },

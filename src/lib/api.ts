@@ -68,11 +68,10 @@ export const api = {
     request<{ capacity: number; days: SlotDay[] }>(`/slots${q({ city, category, exclude })}`),
   coupons: () => request<{ coupons: Coupon[] }>('/coupons'),
 
-  sendOtp: (phone: string) => request<{ sent: boolean; expiresIn: number; devCode?: string }>('/auth/otp/send', { method: 'POST', body: { phone } }),
-  verifyOtp: (phone: string, code: string) =>
-    request<{ token: string; customer: Customer; isNew: boolean }>('/auth/otp/verify', { method: 'POST', body: { phone, code } }),
+  googleSignIn: (accessToken: string) =>
+    request<{ token: string; customer: Customer; isNew: boolean }>('/auth/google', { method: 'POST', body: { accessToken } }),
   me: () => request<{ customer: Customer }>('/me', { auth: true }),
-  updateMe: (body: { name?: string; email?: string }) => request<{ customer: Customer }>('/me', { method: 'PATCH', body, auth: true }),
+  updateMe: (body: { name?: string; phone?: string }) => request<{ customer: Customer }>('/me', { method: 'PATCH', body, auth: true }),
   addAddress: (body: Omit<Address, 'id' | 'isDefault'> & { isDefault?: boolean }) =>
     request<{ customer: Customer; addressId: string }>('/me/addresses', { method: 'POST', body, auth: true }),
   updateAddress: (id: string, body: Partial<Address>) =>

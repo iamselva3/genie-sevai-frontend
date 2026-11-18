@@ -1,7 +1,7 @@
-import { createBooking, createCustomer, expect, signInWithOtp, test, uniquePhone, useCustomerSession } from './fixtures';
+import { createBooking, createCustomer, expect, signInWithGoogle, test, uniquePhone, useCustomerSession } from './fixtures';
 
 test.describe('customer booking flow', () => {
-  test('books a service end to end: cart → coupon → OTP sign-in → address → slot → confirmed', async ({ page }) => {
+  test('books a service end to end: cart → coupon → Google sign-in → mobile number → address → slot → confirmed', async ({ page }) => {
     await page.goto('/c/cleaning');
     await page.getByRole('button', { name: 'Add Bathroom deep cleaning' }).click();
     await page.getByTestId('cart-pill').click();
@@ -26,10 +26,22 @@ test.describe('customer booking flow', () => {
     // Checkout asks for sign-in
     await page.getByRole('button', { name: /Choose address & slot/ }).click();
     await expect(page.getByRole('dialog')).toContainText('Sign in to pick an address and time slot.');
-    await page.getByLabel('Mobile number').fill('123');
-    await page.getByRole('button', { name: 'Get OTP' }).click();
-    await expect(page.getByText('Enter a valid 10-digit mobile number')).toBeVisible();
-    await signInWithOtp(page, uniquePhone(), 'Asha Krishnan');
+    // closing the Google window is not an error
+    await page.getByRole('button', { name: 'Continue with Google' }).click();
+    await expect(page.getByRole('button', { name: 'Continue with Google' })).toBeEnabled();
+    await expect(page.getByRole('dialog').getByRole('alert')).toHaveCount(0);
+    await signInWithGoogle(page, { name: 'Asha Krishnan', email: `asha.${Date.now()}@example.com` });
+
+    // First sign-in: the name comes from Google, the mobile number is asked once
+    const details = page.getByRole('dialog', { name: 'One last step' });
+    await expect(details).toContainText('Signed in as asha.');
+    await expect(details.getByLabel('Your name')).toHaveCount(0);
+    await details.getByLabel('Mobile number').fill('123');
+    await details.getByRole('button', { name: 'Continue' }).click();
+    await expect(details.getByText('Enter a valid 10-digit mobile number')).toBeVisible();
+    await details.getByLabel('Mobile number').fill(uniquePhone());
+    await details.getByRole('button', { name: 'Continue' }).click();
+    await expect(page.getByText('Welcome, Asha')).toBeVisible();
     await expect(page).toHaveURL(/\/checkout$/);
     await expect(page.getByText('Booking for Asha Krishnan')).toBeVisible();
 
@@ -96,9 +108,12 @@ test.describe('customer booking flow', () => {
     await useCustomerSession(page, customer.token);
     await page.goto('/account');
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Meera Iyer');
-    await page.getByLabel('Email (for receipts)').fill('meera@example.com');
+    await expect(page.getByLabel('Email')).toHaveValue(customer.email);
+    const phone = uniquePhone();
+    await page.getByLabel('Mobile number').fill(phone);
     await page.getByRole('button', { name: 'Save profile' }).click();
     await expect(page.getByText('Profile saved')).toBeVisible();
+    await expect(page.getByText(`+91 ${phone}`)).toBeVisible();
 
     await page.getByRole('button', { name: 'Add', exact: true }).click();
     await page.getByLabel('House / flat & building').fill('4, Palm Grove');
@@ -113,7 +128,24 @@ test.describe('customer booking flow', () => {
 
     await page.getByRole('button', { name: 'Sign out' }).click();
     await page.getByRole('dialog', { name: 'Sign out?' }).getByRole('button', { name: 'Sign out' }).click();
-    await expect(page.getByRole('button', { name: 'Sign in with OTP' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Sign in with Google' })).toBeVisible();
+  });
+
+  test('signed in without a mobile number: checkout asks for it before booking', async ({ page, request }) => {
+    const customer = await createCustomer(request, 'Karthik Raja', null);
+    await useCustomerSession(page, customer.token);
+    await page.goto('/c/cleaning');
+    await page.getByRole('button', { name: 'Add Bathroom deep cleaning' }).click();
+    await page.goto('/checkout');
+    const contact = page.getByRole('region', { name: 'How can your professional reach you?' });
+    await expect(contact).toBeVisible();
+    await expect(page.getByText('Booking for Karthik Raja')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Add your mobile number' }).first()).toBeDisabled();
+    const phone = uniquePhone();
+    await contact.getByLabel('Mobile number').fill(phone);
+    await contact.getByRole('button', { name: 'Save number' }).click();
+    await expect(page.getByText(`Booking for Karthik Raja · +91 ${phone}`)).toBeVisible();
+    await expect(contact).toHaveCount(0);
   });
 
   test('help desk and professional application forms', async ({ page }) => {

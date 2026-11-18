@@ -61,9 +61,11 @@ export interface Address {
 
 export interface Customer {
   id: string;
+  /** Contact number for the professional; '' until the customer adds it after signing in with Google. */
   phone: string;
   name: string;
   email: string;
+  avatarUrl?: string;
   addresses: Address[];
 }
 

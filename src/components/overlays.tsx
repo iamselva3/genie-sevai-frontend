@@ -1,18 +1,20 @@
 import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { ArrowRight, Check, CornerDownLeft, MapPin, Search, X } from 'lucide-react';
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/auth';
 import { useCart } from '../context/cart';
 import { useCity } from '../context/city';
 import { useUi } from '../context/ui';
-import { api, ApiError } from '../lib/api';
-import { isValidPhone, rupees } from '../lib/format';
+import { api } from '../lib/api';
+import { rupees } from '../lib/format';
+import { GoogleCancelled, googleAccessToken, googleReady, loadGoogle } from '../lib/google';
 import { useDebounced, useScrollLock } from '../lib/hooks';
 import { categoryIcon } from '../lib/icons';
-import { Button, Field, Modal } from './ui';
+import { ContactForm, needsContact } from './contact';
+import { Button, FormError, Modal } from './ui';
 
 export function Overlays() {
   const { openSearch, closeSearch, searchOpen } = useUi();
@@ -39,174 +41,85 @@ export function Overlays() {
   );
 }
 
-/* ---------------- Sign in with phone OTP ---------------- */
+/* ---------------- Sign in with Google ---------------- */
+
+function GoogleMark() {
+  return (
+    <svg viewBox="0 0 48 48" className="size-5" aria-hidden>
+      <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.6-.4-3.5Z" />
+      <path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7Z" />
+      <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44Z" />
+      <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.6-.4-3.5Z" />
+    </svg>
+  );
+}
 
 function AuthSheet() {
   const { auth, closeAuth, toast } = useUi();
-  const { signIn } = useAuth();
-  const [step, setStep] = useState<'phone' | 'code' | 'name'>('phone');
-  const [phone, setPhone] = useState('');
-  const [code, setCode] = useState('');
-  const [name, setName] = useState('');
-  const [devCode, setDevCode] = useState<string | null>(null);
+  const { signIn, customer } = useAuth();
+  const [step, setStep] = useState<'google' | 'details'>('google');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [resendIn, setResendIn] = useState(0);
-  const [session, setSession] = useState<{ token: string } | null>(null);
 
   useEffect(() => {
-    if (auth) {
-      setStep('phone');
-      setCode('');
-      setError(null);
-      setDevCode(null);
-      setSession(null);
-    }
+    if (!auth) return;
+    setStep('google');
+    setError(null);
+    setBusy(false);
+    // Fetch Google's script while the customer reads the sheet, so the click opens the window at once.
+    if (googleReady) loadGoogle().catch(() => undefined);
   }, [auth]);
 
-  useEffect(() => {
-    if (resendIn <= 0) return;
-    const t = window.setTimeout(() => setResendIn((n) => n - 1), 1000);
-    return () => window.clearTimeout(t);
-  }, [resendIn]);
-
-  const finish = (customerName: string) => {
+  const finish = (name: string) => {
     const onSuccess = auth?.onSuccess;
     closeAuth();
-    toast(customerName ? `Welcome, ${customerName.split(' ')[0]}` : 'Signed in', 'ok');
+    toast(name ? `Welcome, ${name.split(' ')[0]}` : 'Signed in', 'ok');
     onSuccess?.();
   };
 
-  const sendCode = async (e?: FormEvent) => {
-    e?.preventDefault();
-    if (!isValidPhone(phone)) {
-      setError('Enter a valid 10-digit mobile number');
-      return;
-    }
-    setBusy(true);
+  const continueWithGoogle = async () => {
     setError(null);
-    try {
-      const res = await api.sendOtp(phone);
-      setDevCode(res.devCode ?? null);
-      setStep('code');
-      setResendIn(30);
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Could not send the code');
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const verify = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!/^\d{6}$/.test(code)) {
-      setError('Enter the 6-digit code');
-      return;
-    }
     setBusy(true);
-    setError(null);
     try {
-      const res = await api.verifyOtp(phone, code);
+      const accessToken = await googleAccessToken();
+      const res = await api.googleSignIn(accessToken);
       signIn(res.token, res.customer);
-      if (!res.customer.name) {
-        setSession({ token: res.token });
-        setStep('name');
-      } else finish(res.customer.name);
+      if (needsContact(res.customer)) setStep('details');
+      else finish(res.customer.name);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Could not verify the code');
+      if (!(err instanceof GoogleCancelled)) setError(err instanceof Error ? err.message : 'Could not sign you in');
     } finally {
       setBusy(false);
     }
   };
 
-  const saveName = async (e: FormEvent) => {
-    e.preventDefault();
-    if (name.trim().length < 2) {
-      setError('Enter your name');
-      return;
-    }
-    setBusy(true);
-    setError(null);
-    try {
-      const res = await api.updateMe({ name: name.trim() });
-      if (session) signIn(session.token, res.customer);
-      finish(res.customer.name);
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Could not save your name');
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const titles = { phone: 'Sign in to Genie Sevai', code: 'Check your phone', name: 'What should we call you?' };
+  const titles = { google: 'Sign in to Genie Sevai', details: 'One last step' };
 
   return (
     <Modal open={!!auth} onClose={closeAuth} title={titles[step]} variant="center">
-      {auth?.reason && step === 'phone' && <p className="-mt-1 mb-4 text-[14px] text-mute">{auth.reason}</p>}
-      {step === 'phone' && (
-        <form onSubmit={sendCode} className="space-y-4" noValidate>
-          <Field
-            label="Mobile number"
-            lead="+91"
-            inputMode="numeric"
-            autoComplete="tel-national"
-            maxLength={10}
-            value={phone}
-            onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-            placeholder="98765 43210"
-            error={error}
-          />
-          <Button type="submit" block size="lg" busy={busy}>
-            Get OTP <ArrowRight className="size-4" aria-hidden />
+      {step === 'google' && (
+        <div className="space-y-4">
+          {auth?.reason && <p className="-mt-1 text-[14px] text-mute">{auth.reason}</p>}
+          <Button variant="outline" block size="lg" busy={busy} onClick={continueWithGoogle}>
+            {!busy && <GoogleMark />} Continue with Google
           </Button>
+          <FormError>{error}</FormError>
           <p className="text-center text-[12px] text-mute">
-            By continuing you agree to our{' '}
+            We only use your name and email from Google. By continuing you agree to our{' '}
             <Link to="/terms" onClick={closeAuth} className="underline">
               terms
             </Link>
             .
           </p>
-        </form>
+        </div>
       )}
-      {step === 'code' && (
-        <form onSubmit={verify} className="space-y-4" noValidate>
+      {step === 'details' && customer && (
+        <div className="space-y-4">
           <p className="-mt-1 text-[14px] text-mute">
-            We sent a 6-digit code to <strong className="text-ink">+91 {phone.slice(0, 5)} {phone.slice(5)}</strong>.{' '}
-            <button type="button" className="font-semibold text-ink underline" onClick={() => setStep('phone')}>
-              Change
-            </button>
+            Signed in as <strong className="text-ink">{customer.email}</strong>. Add your mobile number so your professional can reach you.
           </p>
-          <Field
-            label="One-time code"
-            inputMode="numeric"
-            autoComplete="one-time-code"
-            maxLength={6}
-            value={code}
-            onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-            className="[&_input]:text-center [&_input]:font-mono [&_input]:text-2xl [&_input]:tracking-[0.5em]"
-            error={error}
-            data-autofocus
-          />
-          {devCode && (
-            <p className="rounded-xl border border-dashed border-line-2 bg-paper px-3 py-2 text-[13px]" data-testid="dev-code">
-              Test mode · your code is <strong className="font-mono">{devCode}</strong>
-            </p>
-          )}
-          <Button type="submit" block size="lg" busy={busy}>
-            Verify & continue
-          </Button>
-          <button type="button" disabled={resendIn > 0 || busy} onClick={() => sendCode()} className="w-full text-center text-[13px] font-semibold underline disabled:text-mute disabled:no-underline">
-            {resendIn > 0 ? `Resend code in ${resendIn}s` : 'Resend code'}
-          </button>
-        </form>
-      )}
-      {step === 'name' && (
-        <form onSubmit={saveName} className="space-y-4" noValidate>
-          <Field label="Your name" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Full name" error={error} />
-          <Button type="submit" block size="lg" busy={busy}>
-            Continue
-          </Button>
-        </form>
+          <ContactForm customer={customer} onSaved={(c) => finish(c.name)} />
+        </div>
       )}
     </Modal>
   );

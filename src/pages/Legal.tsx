@@ -10,8 +10,8 @@ const TERMS = [
 ];
 
 const PRIVACY = [
-  ['What we collect', 'Your mobile number, name, optional email, saved addresses and booking history.'],
-  ['Why', 'To sign you in, match you with a professional, share your address and slot with them, and send booking updates.'],
+  ['What we collect', 'Your name, email and profile photo from your Google account, your mobile number, saved addresses and booking history.'],
+  ['Why', 'To sign you in, match you with a professional, share your address, number and slot with them, and send booking updates.'],
   ['Who sees it', 'Only the professional assigned to your booking sees your name, phone and address, and only for that booking. We do not sell personal data.'],
   ['Retention', 'Booking records are kept for accounting and dispute resolution. You can ask us to delete your account from Help & support.'],
   ['Your choices', 'You can edit your profile and addresses at any time from Account.'],

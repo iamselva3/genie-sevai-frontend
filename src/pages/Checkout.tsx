@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { AddressForm, addressLine } from '../components/address';
 import { BillCard, SlotPicker, type SlotValue } from '../components/booking';
+import { ContactForm, needsContact } from '../components/contact';
 import { Button, FormError, Skeleton, TextArea } from '../components/ui';
 import { useAuth } from '../context/auth';
 import { useCart } from '../context/cart';
@@ -62,17 +63,18 @@ export default function Checkout() {
     return (
       <div className="mx-auto max-w-xl px-4 pt-10 text-center">
         <h1 className="display text-4xl font-extrabold">Sign in to continue</h1>
-        <p className="mt-3 text-mute">We’ll use your number to send booking updates.</p>
+        <p className="mt-3 text-mute">Use your Google account. It only takes a tap.</p>
         <Button size="lg" className="mt-6" onClick={() => requireAuth()}>
-          Sign in with OTP
+          Sign in with Google
         </Button>
       </div>
     );
   }
 
   const q = quote.data?.quote;
-  const canPlace = !!q && !!addressId && !!slot && !busy;
-  const placeLabel = !addressId ? 'Add an address' : !slot ? 'Pick a slot' : 'Place booking';
+  const missingContact = needsContact(customer);
+  const canPlace = !!q && !!addressId && !!slot && !missingContact && !busy;
+  const placeLabel = missingContact ? 'Add your mobile number' : !addressId ? 'Add an address' : !slot ? 'Pick a slot' : 'Place booking';
 
   const place = async () => {
     if (!q || !addressId || !slot || !citySlug) return;
@@ -111,10 +113,20 @@ export default function Checkout() {
         <ArrowLeft className="size-4" aria-hidden /> Back to cart
       </Link>
       <h1 className="display mt-4 text-[44px] font-extrabold md:text-[64px]">Almost there</h1>
-      {customer && (
+      {customer && !missingContact && (
         <p className="mt-2 text-[15px] text-mute">
           Booking for <strong className="text-ink">{customer.name}</strong> · +91 {customer.phone}
         </p>
+      )}
+      {customer && missingContact && (
+        <section className="card-soft mt-6 max-w-xl p-5 md:p-7" aria-labelledby="contact-title">
+          <h2 id="contact-title" className="display text-2xl font-bold">
+            How can your professional reach you?
+          </h2>
+          <div className="mt-4">
+            <ContactForm customer={customer} submit="Save number" onSaved={() => toast('Mobile number saved', 'ok')} />
+          </div>
+        </section>
       )}
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_400px]">
