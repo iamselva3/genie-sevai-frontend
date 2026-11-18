@@ -37,7 +37,7 @@ export function CategoryTile({ category }: { category: Category }) {
   );
 }
 
-const TONES = ['bg-tile', 'bg-brand-soft', 'bg-brand-mist', 'bg-[#eef2f6]'];
+const TONES = ['bg-tile', 'bg-brand-soft', 'bg-brand-mist', 'bg-[#efeff2]'];
 
 /** Stable per-service look (background tone, mirrored art) so rows of one category don't repeat. */
 function artLook(slug: string) {

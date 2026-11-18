@@ -157,3 +157,12 @@ export async function findGradients(page: Page) {
     return hits;
   });
 }
+
+/** Removes banners with this title (keeps the seeded four for other tests). */
+export async function deleteBannersTitled(request: APIRequestContext, title: string) {
+  const token = await adminToken(request);
+  const { banners } = await json<{ banners: { id: string; title: string }[] }>(await request.get(`${API}/admin/banners`, { headers: bearer(token) }));
+  for (const b of banners.filter((x) => x.title === title)) {
+    await json(await request.delete(`${API}/admin/banners/${b.id}`, { headers: bearer(token) }));
+  }
+}

@@ -19,7 +19,8 @@ test.describe('phone layout', () => {
     for (const path of ['/', '/explore', '/c/cleaning', '/c/salon-women', '/cart', '/bookings', '/account', '/help', '/pro', '/terms']) {
       await page.goto(path);
       await page.waitForLoadState('networkidle');
-      const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+      // clientWidth, not innerWidth: a too-wide page makes phones zoom out, which grows innerWidth too.
+      const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
       expect(overflow, `horizontal overflow on ${path}`).toBeLessThanOrEqual(0);
     }
   });
@@ -31,7 +32,7 @@ test.describe('phone layout', () => {
     await page.getByRole('button', { name: 'Add Bathroom deep cleaning' }).click();
     await page.goto('/checkout');
     await expect(page.getByTestId('slot-picker')).toBeVisible();
-    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(overflow).toBeLessThanOrEqual(0);
     const card = await page.getByTestId('slot-picker').boundingBox();
     expect(card!.x + card!.width).toBeLessThanOrEqual(page.viewportSize()!.width);

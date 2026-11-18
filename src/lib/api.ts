@@ -4,6 +4,20 @@ import type { Address, Booking, Category, City, Coupon, Customer, HomeData, Quot
 export const API_URL = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/+$/, '') || 'http://localhost:5100/api/v1';
 export const TOKEN_KEY = 'sevai:token';
 
+const API_ORIGIN = (() => {
+  try {
+    return new URL(API_URL).origin;
+  } catch {
+    return '';
+  }
+})();
+
+/** Full address of an uploaded picture ('/uploads/x.webp' lives on the API host). */
+export function assetUrl(src: string) {
+  if (!src) return '';
+  return /^https?:\/\//.test(src) ? src : `${API_ORIGIN}${src.startsWith('/') ? '' : '/'}${src}`;
+}
+
 export class ApiError extends Error {
   constructor(
     public status: number,

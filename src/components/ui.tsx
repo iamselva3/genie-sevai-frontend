@@ -15,13 +15,13 @@ import { useScrollLock } from '../lib/hooks';
 
 /* ---------------- Button ---------------- */
 
-/** ink = primary (blue), sun = outlined accent (e.g. "Add"), outline = neutral, ghost, danger. */
+/** ink = primary (black), sun = outlined accent (e.g. "Add"), outline = neutral, ghost, danger. */
 type Variant = 'ink' | 'sun' | 'outline' | 'ghost' | 'danger';
 type Size = 'sm' | 'md' | 'lg';
 
 const VARIANTS: Record<Variant, string> = {
-  ink: 'bg-brand text-white shadow-[0_1px_2px_rgb(15_23_42/0.1)] hover:bg-brand-dark',
-  sun: 'bg-white text-brand border border-brand/45 hover:bg-brand-soft hover:border-brand',
+  ink: 'bg-brand text-white shadow-[0_1px_2px_rgb(0_0_0/0.12)] hover:bg-brand-dark',
+  sun: 'bg-white text-ink border border-ink/30 hover:bg-brand-soft hover:border-ink',
   outline: 'bg-white text-ink border border-line-2 hover:border-ink-3',
   ghost: 'bg-transparent text-ink hover:bg-tile',
   danger: 'bg-bad text-white hover:opacity-90',
@@ -226,7 +226,7 @@ export function Stepper({ value, onChange, label, max = 10, size = 'md' }: { val
   const btn = size === 'sm' ? 'w-8' : 'w-9';
   return (
     <div className={clsx('inline-flex items-center rounded-lg border border-brand/45 bg-brand-soft text-brand-dark', h)}>
-      <button type="button" aria-label={`Remove one ${label}`} onClick={() => onChange(value - 1)} className={clsx('grid h-full place-items-center rounded-l-lg hover:bg-[#dce8ff]', btn)}>
+      <button type="button" aria-label={`Remove one ${label}`} onClick={() => onChange(value - 1)} className={clsx('grid h-full place-items-center rounded-l-lg hover:bg-brand-soft', btn)}>
         <Minus className="size-4" strokeWidth={2.5} />
       </button>
       <span className="min-w-6 text-center text-[15px] font-semibold tabular-nums" aria-live="polite" aria-label={`${value} in cart`}>
@@ -237,7 +237,7 @@ export function Stepper({ value, onChange, label, max = 10, size = 'md' }: { val
         aria-label={`Add one more ${label}`}
         disabled={value >= max}
         onClick={() => onChange(value + 1)}
-        className={clsx('grid h-full place-items-center rounded-r-lg hover:bg-[#dce8ff] disabled:opacity-40', btn)}
+        className={clsx('grid h-full place-items-center rounded-r-lg hover:bg-brand-soft disabled:opacity-40', btn)}
       >
         <Plus className="size-4" strokeWidth={2.5} />
       </button>

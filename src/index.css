@@ -9,46 +9,47 @@
 }
 
 /*
- * Design v2: blue & white, soft surfaces. Solid colours only (no gradients).
- * The older token names (sun, ink, paper...) are kept as aliases so every component reads well.
+ * Design v2: black & white with neutral greys, soft surfaces. Solid colours only (no gradients).
+ * Green is the only hue, kept for availability and prices.
+ * "brand" is the black accent. The older token names (sun, ink, paper...) are kept as aliases so every component reads well.
  */
 @theme {
-  --color-brand: #2563eb;
-  --color-brand-dark: #1d4ed8;
-  --color-brand-deep: #1e3a8a;
-  --color-brand-navy: #0b1f4d;
-  --color-brand-light: #93c5fd;
-  --color-brand-soft: #eaf1ff;
-  --color-brand-mist: #f5f8ff;
+  --color-brand: #111111;
+  --color-brand-dark: #000000;
+  --color-brand-deep: #0a0a0a;
+  --color-brand-navy: #111111;
+  --color-brand-light: #d4d4d8;
+  --color-brand-soft: #f0f0f2;
+  --color-brand-mist: #f6f6f7;
 
-  --color-ink: #0f172a;
-  --color-ink-2: #1e293b;
-  --color-ink-3: #334155;
-  --color-paper: #f7f8fa;
+  --color-ink: #111111;
+  --color-ink-2: #242428;
+  --color-ink-3: #3c3c43;
+  --color-paper: #f6f6f7;
   --color-white: #ffffff;
-  --color-tile: #f2f4f7;
-  --color-line: #e5e7eb;
-  --color-line-2: #d5d9e0;
-  --color-mute: #5b6475;
-  --color-mute-2: #98a2b3;
+  --color-tile: #f2f2f4;
+  --color-line: #e6e6e9;
+  --color-line-2: #d4d4d9;
+  --color-mute: #5e5e66;
+  --color-mute-2: #a1a1aa;
   --color-ok: #127a3c;
   --color-ok-soft: #e9f8ef;
   --color-bad: #b42318;
 
-  /* legacy aliases (soft blues) */
-  --color-sun: #dce8ff;
-  --color-sun-soft: #eef4ff;
-  --color-sun-deep: #c6d9ff;
-  --color-sun-dark: #3b6fe0;
+  /* legacy aliases (soft greys) */
+  --color-sun: #e6e6ea;
+  --color-sun-soft: #f3f3f5;
+  --color-sun-deep: #d4d4d9;
+  --color-sun-dark: #3c3c43;
 
   --font-display: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-sans: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
-  --shadow-block: 0 1px 2px 0 rgb(15 23 42 / 0.06), 0 6px 16px -8px rgb(15 23 42 / 0.18);
-  --shadow-block-md: 0 2px 4px 0 rgb(15 23 42 / 0.05), 0 14px 30px -12px rgb(15 23 42 / 0.22);
-  --shadow-block-lg: 0 4px 10px 0 rgb(15 23 42 / 0.05), 0 28px 56px -20px rgb(15 23 42 / 0.28);
-  --shadow-lift: 0 18px 40px -18px rgb(15 23 42 / 0.3);
+  --shadow-block: 0 1px 2px 0 rgb(0 0 0 / 0.05), 0 6px 16px -8px rgb(0 0 0 / 0.16);
+  --shadow-block-md: 0 2px 4px 0 rgb(0 0 0 / 0.04), 0 14px 30px -12px rgb(0 0 0 / 0.2);
+  --shadow-block-lg: 0 4px 10px 0 rgb(0 0 0 / 0.04), 0 28px 56px -20px rgb(0 0 0 / 0.26);
+  --shadow-lift: 0 18px 40px -18px rgb(0 0 0 / 0.28);
 
   --ease-spring: cubic-bezier(0.2, 0.8, 0.2, 1);
 
@@ -93,7 +94,7 @@
     text-rendering: optimizeLegibility;
     overflow-x: hidden;
   }
-  ::selection { background: var(--color-brand-soft); color: var(--color-brand-deep); }
+  ::selection { background: var(--color-ink); color: var(--color-white); }
   :focus-visible {
     outline: 2px solid var(--color-brand);
     outline-offset: 2px;
@@ -106,8 +107,8 @@
 @layer components {
   .display { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.03em; line-height: 1.06; }
 
-  /* Accent words in headings */
-  .mark { color: var(--color-brand); }
+  /* Accent words in headings: a quieter grey next to the black */
+  .mark { color: var(--color-mute); }
 
   .card { background: var(--color-white); border: 1px solid var(--color-line); border-radius: 20px; box-shadow: var(--shadow-block); }
   .card-soft { background: var(--color-white); border: 1px solid var(--color-line); border-radius: 18px; }
@@ -119,27 +120,27 @@
     font-size: 13px; font-weight: 500; white-space: nowrap; color: var(--color-ink-2);
     transition: background 0.2s, border-color 0.2s, color 0.2s;
   }
-  .chip:hover { border-color: var(--color-brand); color: var(--color-brand-dark); }
-  .chip[aria-pressed='true'], .chip.is-active { background: var(--color-brand-soft); border-color: var(--color-brand); color: var(--color-brand-dark); }
+  .chip:hover { border-color: var(--color-ink); color: var(--color-ink); }
+  .chip[aria-pressed='true'], .chip.is-active { background: var(--color-ink); border-color: var(--color-ink); color: var(--color-white); }
 
   .field {
     width: 100%; height: 48px; padding: 0 14px; border-radius: 12px;
     border: 1px solid var(--color-line-2); background: var(--color-white);
     font-size: 15px; transition: border-color 0.2s, box-shadow 0.2s;
   }
-  .field:focus { outline: none; border-color: var(--color-brand); box-shadow: 0 0 0 4px rgb(37 99 235 / 0.14); }
+  .field:focus { outline: none; border-color: var(--color-ink); box-shadow: 0 0 0 4px rgb(0 0 0 / 0.08); }
   textarea.field { height: auto; padding: 12px 14px; resize: vertical; }
   .field[aria-invalid='true'] { border-color: var(--color-bad); }
 
   .label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 500; color: var(--color-ink-3); }
 
-  /* Icon in a soft blue square */
+  /* Icon in a soft grey square */
   .block-icon {
     display: grid; place-items: center; flex: none;
-    background: var(--color-brand-soft); color: var(--color-brand-dark); border-radius: 14px;
+    background: var(--color-brand-soft); color: var(--color-ink); border-radius: 14px;
   }
 
-  .skeleton { background: #eef0f4; border-radius: 12px; animation: var(--animate-pulse-soft); }
+  .skeleton { background: #efeff1; border-radius: 12px; animation: var(--animate-pulse-soft); }
 
   .no-scrollbar { scrollbar-width: none; }
   .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -163,7 +164,8 @@
 .lazy-section { content-visibility: auto; contain-intrinsic-size: auto 640px; }
 
 /* ---------------- Offer carousel ---------------- */
-.promo { perspective: 1600px; }
+/* Clipped: the waiting slides sit a little to the right, and must never widen the page (phones would zoom out). */
+.promo { perspective: 1600px; overflow: hidden; border-radius: 1.5rem; }
 .promo-slide {
   position: absolute; inset: 0;
   transition: transform 0.85s var(--ease-spring), opacity 0.5s ease;
@@ -172,6 +174,8 @@
 }
 .promo-slide.is-active { opacity: 1; pointer-events: auto; transform: none; }
 .promo-slide.is-prev { transform: translateX(-6%) rotateY(8deg) scale(0.97); }
+/* A banner photo meets the colour on a soft curve */
+.banner-photo { clip-path: ellipse(100% 140% at 100% 50%); }
 
 /* Floating illustration motion */
 .float-slow { animation: float-y 6s ease-in-out infinite; }
@@ -189,7 +193,7 @@
 .is-paused .float-slow, .is-paused .float-fast, .is-paused .bubble { animation-play-state: paused; }
 
 /* ---------------- Sheets & dialogs ---------------- */
-.overlay { position: fixed; inset: 0; background: rgb(15 23 42 / 0.45); animation: var(--animate-fade); }
+.overlay { position: fixed; inset: 0; background: rgb(0 0 0 / 0.5); animation: var(--animate-fade); }
 .sheet { animation: sheet-up 0.38s var(--ease-spring) both; }
 @keyframes sheet-up { from { transform: translateY(100%); } to { transform: none; } }
 @media (min-width: 768px) {

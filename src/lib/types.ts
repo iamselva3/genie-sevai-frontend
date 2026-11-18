@@ -40,9 +40,31 @@ export interface Service {
   unavailableReason: string;
 }
 
+/** Home page banner, managed by the team in the admin panel. */
+export interface Banner {
+  id: string;
+  title: string;
+  subtitle: string;
+  eyebrow: string;
+  ctaLabel: string;
+  /** '' | '/uploads/...' (on the API origin) | https URL */
+  imageUrl: string;
+  /** split = colour + text + picture; image = the picture is the whole banner */
+  layout: 'split' | 'image';
+  background: string;
+  textTone: 'dark' | 'light';
+  art: '' | 'bathroom' | 'ac' | 'gift';
+  action: 'service' | 'category' | 'coupon' | 'link' | 'none';
+  href: string | null;
+  service: { slug: string; name: string; price: number; mrp: number } | null;
+  couponCode: string | null;
+}
+
 export interface HomeData {
   city: { slug: string; name: string } | null;
   categories: Category[];
+  /** Missing on older APIs. */
+  banners?: Banner[];
   rows: { category: Category; services: Service[] }[];
   popular: Service[];
   stats: { professionals: number; completedBookings: number; averageRating: number | null };
